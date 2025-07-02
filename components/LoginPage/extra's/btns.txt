@@ -1,0 +1,28 @@
+   <div className='absolute top-2 left-2'>
+                {
+                  errormsg == "errorMsg" && (<p className='text-red-500 text-[12px]'>Invalid information please try again</p>)
+                }
+                {
+                  errormsg == "NetworkErr" && (<p className='text-red-500 text-[12px]'>Network Error! Please check your internet</p>)
+                }
+              </div>
+
+              <div className="sm:mx-auto sm:w-full sm:max-w-md mb-4 ">
+                <div className='flex justify-between align-middle gap-3 pt-2 pb-2 pl-4 pr-4'>
+                  <button className='pb-3 rounded-[10px] w-full text-white bg-[#6f11f5] flex gap-2 justify-center align-middle pt-3'>
+                    <FaRegUser className='text-[13px] translate-y-1'
+                      onClick={openLogInPage}
+                    />
+                    Log in
+
+                  </button>
+
+                  <button className='pb-3 rounded-[10px] w-full text-[#6f11f5] flex gap-2 justify-center align-middle pt-3'
+                    onClick={openSignUpPage}
+                  >
+                    <PiUserPlusBold className='text-[17px] text-purple-700 translate-y-[1px]' />
+                    Sign up
+
+                  </button>
+                </div>
+              </div>

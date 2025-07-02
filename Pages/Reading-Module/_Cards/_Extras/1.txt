@@ -1,0 +1,170 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, ScrollView, Button } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+// Import image assets
+import ActualImage1 from '../assets/images/Reading-Images/ActualImg-1.png';
+import ActualImage2 from '../assets/images/Reading-Images/ActualImg-2.png';
+import ActualImage3 from '../assets/images/Reading-Images/ActualImg-3.png';
+// More image imports...
+
+const TestGrid = () => {
+  // Local state initialization
+  const [useremail, setuseremail] = useState('mdpervez946@gmail.com');
+  const [userToken, setuserToken] = useState('afqwefawegzcbx3wb ergerg');
+  const [mainDataAll, setmainData] = useState([]);
+
+  // Arrays for holding test sections
+  let actualTest1 = [];
+  let actualTest2 = [];
+  let actualTest3 = [];
+  // More test arrays...
+
+  // Fetch API data on component mount
+  useEffect(() => {
+    axios({
+      method: 'get',
+      url: 'https://node-js-express-login-example.onrender.com/api/user/AllReadingResults/' + useremail,
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        setmainData(res.data.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, [useremail, userToken]);
+
+  // Assigning mainData to the specific test sections
+  mainDataAll[0] && mainDataAll.map((items) => {
+    if (items.SectionName === 'Actual-Test-1') {
+      actualTest1.push(items);
+    }
+    if (items.SectionName === 'Actual-Test-2') {
+      actualTest2.push(items);
+    }
+    if (items.SectionName === 'Actual-Test-3') {
+      actualTest3.push(items);
+    }
+    // More mappings...
+  });
+
+  // Redirect function for each test
+  const redirectToTest = (testNum) => {
+    AsyncStorage.setItem('moduleNo', testNum.toString())
+      .then(() => {
+        console.log(`Redirecting to test ${testNum}`);
+        // You can navigate to the corresponding screen here using React Navigation
+      })
+      .catch((error) => {
+        console.log('Error saving to AsyncStorage:', error);
+      });
+  };
+
+  // UI Array for test cards
+  const UI_Array = [
+    {
+      testNumber: 1,
+      testImage: ActualImage1,
+      Scores: actualTest1[0] && actualTest1,
+      Rating: '4.9',
+      Reviews: '(120 reviews)',
+      peoplesCount: '1450',
+      Titles: 'Language , HARD LANGUAGES, Translation software',
+      redirect_func: () => redirectToTest(1),
+      avatar: 'https://randomuser.me/api/portraits/men/1.jpg', // Example avatar
+    },
+    {
+      testNumber: 2,
+      testImage: ActualImage2,
+      Scores: actualTest2[0] && actualTest2,
+      Rating: '4.7',
+      Reviews: '(95 reviews)',
+      peoplesCount: '1325',
+      Titles: 'Healthy Food?, Fitter with friends, Glue bones',
+      redirect_func: () => redirectToTest(2),
+      avatar: 'https://randomuser.me/api/portraits/women/2.jpg', // Example avatar
+    },
+    // More test data...
+  ];
+
+  return (
+    <ScrollView contentContainerStyle={{ padding: 10, paddingTop: 20 }}>
+      <View style={{ width: '100%' }}>
+        {UI_Array.map((item, index) => (
+          <TouchableOpacity key={index} onPress={item.redirect_func}>
+            <LinearGradient
+              colors={['#03c8d8', '#22d4d0', '#13bdcf']}
+              style={{
+                borderRadius: 12,
+                padding: 10,
+                marginBottom: 20,
+                elevation: 4,
+                borderWidth: 1,
+                borderColor: '#0083a8',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Image
+                  source={item.testImage}
+                  style={{
+                    height: 150,
+                    width: 150,
+                    borderRadius: 12,
+                    marginRight: 10,
+                  }}
+                />
+                <View style={{ flex: 1, justifyContent: 'space-between' }}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'black' }}>
+                    {item.Titles}
+                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Image
+                      source={{ uri: item.avatar }}
+                      style={{
+                        height: 40,
+                        width: 40,
+                        borderRadius: 20,
+                        marginRight: 10,
+                      }}
+                    />
+                    <Text style={{ fontSize: 14, color: '#888' }}>
+                      {item.peoplesCount} people
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                    <Icon name="star" size={18} color="#ffd700" />
+                    <Text style={{ fontSize: 14, color: '#888', marginLeft: 5 }}>
+                      {item.Rating} {item.Reviews}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={item.redirect_func}
+                style={{
+                  marginTop: 10,
+                  backgroundColor: '#0083a8',
+                  paddingVertical: 10,
+                  borderRadius: 5,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: 'white', fontSize: 16 }}>Start Test</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScrollView>
+  );
+};
+
+export default TestGrid;

@@ -1,0 +1,196 @@
+
+import React, { useEffect, useState } from 'react';
+import { TouchableOpacity, View, Image, StyleSheet, SafeAreaView, Platform, StatusBar, Text, ScrollView, Pressable } from 'react-native';
+
+import { Image } from 'expo-image'; // or `react-native`'s Image
+import { useNavigation } from '@react-navigation/native';
+
+import { useNavigation } from '@react-navigation/native'; // ✅ Import hook
+
+//section Images------------------
+import test1Sec1Images from "../../../assets/images/Speaking-Images/test1Sec-1.png"
+import test1Sec2Images from "../../../assets/images/Speaking-Images/test1Sec-2.png"
+import test1Sec3Images from "../../../assets/images/Speaking-Images/test1Sec-3.png"
+
+import Single_Card from './Single-Card';
+
+
+
+
+function Card_To_10({ openTestAfter10, setOpenTestsAfter10, mainDataAll }) {
+    const navigation = useNavigation(); // ✅ Get navigation object
+
+    //all localstorage variables for storing the localstorage data...
+    const [useremail, setuseremail] = useState("parvez");
+    const [userToken, setuserToken] = useState("gvy8y6-8v070-8v8")
+    const [userCountry, setuserCountry] = useState("Bangladrsh")
+
+
+    //make array for user scores showing----
+    //check-conditions-when-user-click-on-load-more-10-test-button------------
+    let checkLoadMoreArray = [];
+    let test1sec1 = []; let test1sec2 = []; let test1sec3 = [];
+
+
+    // Speaking-Test1-Section Functions
+    const Test1Sec1 = (e) => {
+        navigation.navigate('Speaking-Main-Page', { ID: 1 })
+    }
+
+
+
+    //in this functtion we will check if user is in free mood
+    const Test1Sec2 = (e) => {
+        if (useremail) {
+            if (userCountry == "Bangladesh") {
+                navigation.navigate('Speaking-Main-Page', { ID: 1 })
+            } else {
+                navigation.navigate('Speaking-Main-Page', { ID: 1 })
+            }
+        } else {
+            alert("Need to login first");
+            //  openLogInPage();
+        }
+
+
+
+
+
+    };
+
+
+
+
+
+
+    const Test1Sec3 = (e) => {
+        // //e.preventDefault();
+        if (useremail) {
+            if (userCountry == "Bangladesh") {
+                navigation.navigate('Speaking-Main-Page', { ID: 1 })
+            } else {
+                navigation.navigate('Speaking-Main-Page', { ID: 1 })
+            }
+        } else {
+            alert("Need to login first");
+            // openLogInPage();
+        }
+
+
+    };
+
+
+
+
+    // Utility function for checking if the user is logged in and has a valid subscription
+    const checkUserAccess = () => {
+        // Ensures userPaymentStatusCheck is valid and not empty
+        return userPaymentStatusCheck !== "" &&
+            userPaymentStatusCheck !== null &&
+            userPaymentStatusCheck !== undefined;
+    };
+
+    // Function to handle navigation and checks
+    const handleTestNavigation = (section) => {
+        if (checkUserAccess()) {
+            // Check for browser and device compatibility before navigation
+            navigation.navigate('Speaking-Main-Page', { ID: 1 })
+        } else {
+            if (useremail && userCountry) {
+                // Store product ID and redirect to payment page
+                history.push("/Payment-Pages/Billing-Page");
+            } else {
+                // Prompt the user to log in
+                alert("Need to login first");
+                //  openLogInPage();
+            }
+        }
+    };
+
+
+
+
+
+    //for storing all speaking scores data for changing UI-----------
+    //test-1
+    mainDataAll[0] && mainDataAll.map((items) => {
+        if (items.SectionName == "Test1Sec1") {
+            test1sec1.push(items);
+        }
+    });
+    mainDataAll[0] && mainDataAll.map((items) => {
+        if (items.SectionName == "Test1Sec2") {
+            test1sec2.push(items);
+        }
+    })
+    mainDataAll[0] && mainDataAll.map((items) => {
+        if (items.SectionName == "Test1Sec3") { test1sec3.push(items); }
+    })
+
+
+    //store all speaking data singleitems for load more 10 test---
+    //test-1
+    if (test1sec1[0]) { checkLoadMoreArray.push("Test1Sec1"); }
+    if (test1sec2[0]) { checkLoadMoreArray.push("Test1Sec2"); }
+    if (test1sec3[0]) { checkLoadMoreArray.push("Test1Sec3"); }
+
+
+
+    return (
+        <>
+            <section className="appie-service-area appie-service-3-area mt-[60px] mb-50 " id="service">
+                <div className='p-[10px] sm:p-[32px]  z-[55]'>
+                    <div className="w-full justify-center pt-[50px] sm:pt-[10px]  rounded-t-[33px]  bg-transparent">
+                        <div className='text-center font-bold text-2xl py-4'>All Practicing Tests</div>
+                        <div className='flex flex-wrap justify-center gap-4  p-[12px] sm:p-[15px]'>
+                            <div className="w-[100%] relative sm:w-[44%] md:w-[28%] p-3 bg-transparent">
+                                <div className={`absolute text-center top-[-5px] right-5 w-[40px] h-[22px]  rounded-tl-[16px] rounded-tr-[4px] rounded-br-[4px] rounded-bl-[4px] grid justify-center align-middle ${(test1sec1[0] || test1sec2[0] || test1sec3[0]) ? "bg-green-600" : "bg-yellow-500"}`}><span className='text-sm font-bold text-white translate-y-[1px]'>1</span></div>
+
+                                <Single_Card
+                                    useremail={useremail}
+                                    redirect_func={Test1Sec1}
+                                    test_card_image={test1Sec1Images}
+                                    rating={"676--test-1"}
+                                    count_peoples={"897"}
+                                    Title={"Talk About Food"}
+                                    test_Scores={test1sec1}
+                                    sectionNames={"1"}
+                                />
+                                <Single_Card
+                                    useremail={useremail}
+                                    redirect_func={Test1Sec2}
+                                    test_card_image={test1Sec2Images}
+                                    rating={"776--test-1"}
+                                    count_peoples={"697"}
+                                    Title={"Tak about an idea you have had to make your learning more effective."}
+                                    test_Scores={test1sec2}
+                                    sectionNames={"2"}
+                                />
+
+                                <Single_Card
+                                    useremail={useremail}
+                                    redirect_func={Test1Sec3}
+                                    test_card_image={test1Sec3Images}
+                                    rating={"696--test-1"}
+                                    count_peoples={"997"}
+                                    Title={"let's talk about children."}
+                                    test_Scores={test1sec3}
+                                    sectionNames={"3"}
+                                />
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </>
+    );
+}
+
+export default Card_To_10;

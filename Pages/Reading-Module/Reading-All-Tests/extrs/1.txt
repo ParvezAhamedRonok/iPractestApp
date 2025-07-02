@@ -1,0 +1,335 @@
+
+import React, { useEffect, useState } from 'react';
+
+import { BsFillPatchQuestionFill } from "react-icons/bs";
+import { LiaReadme } from "react-icons/lia";
+import { useNavigation, useRoute } from '@react-navigation/native'; // ✅ Import both hooks
+import {
+    Test1Panel1_Page1, Test1Panel1_Page2, Test1Panel2_Page1, Test1Panel2_Page2,
+    Test2Panel1_Page1, Test2Panel1_Page2, Test2Panel2_Page1, Test2Panel2_Page2,
+    Test3Panel1_Page1, Test3Panel1_Page2, Test3Panel2_Page1, Test3Panel2_Page2,
+    Test4Panel1_Page1, Test4Panel1_Page2, Test4Panel2_Page1, Test4Panel2_Page2,
+    Test5Panel1_Page1, Test5Panel1_Page2, Test5Panel2_Page1, Test5Panel2_Page2,
+    Test6Panel1_Page1, Test6Panel1_Page2, Test6Panel2_Page1, Test6Panel2_Page2,
+    Test7Panel1_Page1, Test7Panel1_Page2, Test7Panel2_Page1, Test7Panel2_Page2,
+    Test8Panel1_Page1, Test8Panel1_Page2, Test8Panel2_Page1, Test8Panel2_Page2,
+    Test9Panel1_Page1, Test9Panel1_Page2, Test9Panel2_Page1, Test9Panel2_Page2,
+    Test10Panel1_Page1, Test10Panel1_Page2, Test10Panel2_Page1, Test10Panel2_Page2,
+    Test11Panel1_Page1, Test11Panel1_Page2, Test11Panel2_Page1, Test11Panel2_Page2,
+    Test12Panel1_Page1, Test12Panel1_Page2, Test12Panel2_Page1, Test12Panel2_Page2,
+
+    //Cambridge tests importing....
+    //Cambridge 15
+    Cambidge_15_Test1_P1_Q1, Cambidge_15_Test1_P1_Q2, Cambidge_15_Test1_P2_Q1, Cambidge_15_Test1_P2_Q2,
+    Cambidge_15_Test2_P1_Q1, Cambidge_15_Test2_P1_Q2, Cambidge_15_Test2_P2_Q1, Cambidge_15_Test2_P2_Q2,
+    Cambidge_15_Test3_P1_Q1, Cambidge_15_Test3_P1_Q2, Cambidge_15_Test3_P2_Q1, Cambidge_15_Test3_P2_Q2,
+    Cambidge_15_Test4_P1_Q1, Cambidge_15_Test4_P1_Q2, Cambidge_15_Test4_P2_Q1, Cambidge_15_Test4_P2_Q2,
+    //Cambridge 16
+    Cambidge_16_Test1_P1_Q1, Cambidge_16_Test1_P1_Q2, Cambidge_16_Test1_P2_Q1, Cambidge_16_Test1_P2_Q2,
+    Cambidge_16_Test2_P1_Q1, Cambidge_16_Test2_P1_Q2, Cambidge_16_Test2_P2_Q1, Cambidge_16_Test2_P2_Q2,
+    Cambidge_16_Test3_P1_Q1, Cambidge_16_Test3_P1_Q2, Cambidge_16_Test3_P2_Q1, Cambidge_16_Test3_P2_Q2,
+    Cambidge_16_Test4_P1_Q1, Cambidge_16_Test4_P1_Q2, Cambidge_16_Test4_P2_Q1, Cambidge_16_Test4_P2_Q2,
+    //Cambridge 17
+    Cambidge_17_Test1_P1_Q1, Cambidge_17_Test1_P1_Q2, Cambidge_17_Test1_P2_Q1, Cambidge_17_Test1_P2_Q2,
+    Cambidge_17_Test2_P1_Q1, Cambidge_17_Test2_P1_Q2, Cambidge_17_Test2_P2_Q1, Cambidge_17_Test2_P2_Q2,
+    Cambidge_17_Test3_P1_Q1, Cambidge_17_Test3_P1_Q2, Cambidge_17_Test3_P2_Q1, Cambidge_17_Test3_P2_Q2,
+    Cambidge_17_Test4_P1_Q1, Cambidge_17_Test4_P1_Q2, Cambidge_17_Test4_P2_Q1, Cambidge_17_Test4_P2_Q2,
+    //Cambridge 18
+    Cambidge_18_Test1_P1_Q1, Cambidge_18_Test1_P1_Q2, Cambidge_18_Test1_P2_Q1, Cambidge_18_Test1_P2_Q2,
+    Cambidge_18_Test2_P1_Q1, Cambidge_18_Test2_P1_Q2, Cambidge_18_Test2_P2_Q1, Cambidge_18_Test2_P2_Q2,
+    Cambidge_18_Test3_P1_Q1, Cambidge_18_Test3_P1_Q2, Cambidge_18_Test3_P2_Q1, Cambidge_18_Test3_P2_Q2,
+    Cambidge_18_Test4_P1_Q1, Cambidge_18_Test4_P1_Q2, Cambidge_18_Test4_P2_Q1, Cambidge_18_Test4_P2_Q2,
+    //Cambridge 19
+    Cambidge_19_Test1_P1_Q1, Cambidge_19_Test1_P1_Q2, Cambidge_19_Test1_P2_Q1, Cambidge_19_Test1_P2_Q2,
+    Cambidge_19_Test2_P1_Q1, Cambidge_19_Test2_P1_Q2, Cambidge_19_Test2_P2_Q1, Cambidge_19_Test2_P2_Q2,
+    Cambidge_19_Test3_P1_Q1, Cambidge_19_Test3_P1_Q2, Cambidge_19_Test3_P2_Q1, Cambidge_19_Test3_P2_Q2,
+    Cambidge_19_Test4_P1_Q1, Cambidge_19_Test4_P1_Q2, Cambidge_19_Test4_P2_Q1, Cambidge_19_Test4_P2_Q2,
+
+
+} from '../All-Tests/StoreTests';
+
+
+
+
+
+
+
+// end importing....... 
+
+
+
+
+
+function Reading({ handleChange, UserData, RightAnswers }) {
+    const navigation = useNavigation();
+    const route = useRoute();
+    //current path name
+    const testName = route.name || '';
+    // for Mobile Sizes states-----
+    const [mobilePanel1Pages, setMobilePanel1Page1] = useState(true);
+    const [MobilePanel2Pages, setPanel2Pages] = useState(true)
+    const [ActivePanels, setActivePanels] = useState(true)
+    const [passage1Scroll, setPassage1Scroll] = useState(0)
+    const [question1Scroll, setQuestion1Scroll] = useState(0)
+    const [passage2Scroll, setPassage2Scroll] = useState(0)
+    const [question2Scroll, setQuestion2Scroll] = useState(0)
+
+
+
+
+
+    // functions for Mobile Devices---------------->>
+    const Mobilepanel1Functions = () => {
+        if (mobilePanel1Pages) {
+
+            setPassage1Scroll(getYPosition());
+            document.documentElement.scrollTop = question1Scroll;
+        }
+        else {
+
+            setQuestion1Scroll(getYPosition());
+            document.documentElement.scrollTop = passage1Scroll;
+        }
+
+        setMobilePanel1Page1(!mobilePanel1Pages)
+
+    }
+    const Mobilepanel2Functions = () => {
+        if (MobilePanel2Pages) {
+
+            setPassage2Scroll(getYPosition());
+            document.documentElement.scrollTop = question2Scroll;
+        }
+        else {
+
+            setQuestion2Scroll(getYPosition());
+            document.documentElement.scrollTop = passage2Scroll;
+        }
+        setPanel2Pages(!MobilePanel2Pages)
+    }
+    const ClickActivePanels = (x) => {
+        setActivePanels(!ActivePanels)
+    }
+
+
+
+    function getYPosition() {
+        var top = window.pageYOffset || document.documentElement.scrollTop
+        return top;
+    }
+
+
+    return (
+        <div className='mainContainer' >
+            <section id={'innersection'} className="pb-[120px]">
+                <div className='p-4' style={{ display: ActivePanels ? "initial" : "none" }}>
+                    <div style={{ display: mobilePanel1Pages ? "initial" : "none" }} >
+                        {testName.includes("Actual-Test-1") && <Test1Panel1_Page1 />}
+                        {testName.includes("Actual-Test-2") && <Test2Panel1_Page1 />}
+                        {testName.includes("Actual-Test-3") && <Test3Panel1_Page1 />}
+                        {testName.includes("Actual-Test-4") && <Test4Panel1_Page1 />}
+                        {testName.includes("Actual-Test-5") && <Test5Panel1_Page1 />}
+                        {testName.includes("Actual-Test-6") && <Test6Panel1_Page1 />}
+                        {testName.includes("Actual-Test-7") && <Test7Panel1_Page1 />}
+                        {testName.includes("Actual-Test-8") && <Test8Panel1_Page1 />}
+                        {testName.includes("Actual-Test-9") && <Test9Panel1_Page1 />}
+                        {testName.includes("Actual-Test-10") && <Test10Panel1_Page1 />}
+                        {testName.includes("Actual-Test-11") && <Test11Panel1_Page1 />}
+                        {testName.includes("Actual-Test-12") && <Test12Panel1_Page1 />}
+
+                        {/* Cambridge-allPages */}
+                        {testName === "Cambridge-19-Test1" && <Cambidge_19_Test1_P1_Q1 />}
+                        {testName === "Cambridge-19-Test2" && <Cambidge_19_Test2_P1_Q1 />}
+                        {testName === "Cambridge-19-Test3" && <Cambidge_19_Test3_P1_Q1 />}
+                        {testName === "Cambridge-19-Test4" && <Cambidge_19_Test4_P1_Q1 />}
+                        {/* Test-18 */}
+                        {testName === "Cambridge-18-Test1" && <Cambidge_18_Test1_P1_Q1 />}
+                        {testName === "Cambridge-18-Test2" && <Cambidge_18_Test2_P1_Q1 />}
+                        {testName === "Cambridge-18-Test3" && <Cambidge_18_Test3_P1_Q1 />}
+                        {testName === "Cambridge-18-Test4" && <Cambidge_18_Test4_P1_Q1 />}
+                        {/* Test-17 */}
+                        {testName === "Cambridge-17-Test1" && <Cambidge_17_Test1_P1_Q1 />}
+                        {testName === "Cambridge-17-Test2" && <Cambidge_17_Test2_P1_Q1 />}
+                        {testName === "Cambridge-17-Test3" && <Cambidge_17_Test3_P1_Q1 />}
+                        {testName === "Cambridge-17-Test4" && <Cambidge_17_Test4_P1_Q1 />}
+                        {/* Test-16 */}
+                        {testName === "Cambridge-16-Test1" && <Cambidge_16_Test1_P1_Q1 />}
+                        {testName === "Cambridge-16-Test2" && <Cambidge_16_Test2_P1_Q1 />}
+                        {testName === "Cambridge-16-Test3" && <Cambidge_16_Test3_P1_Q1 />}
+                        {testName === "Cambridge-16-Test4" && <Cambidge_16_Test4_P1_Q1 />}
+                        {/* Test-15 */}
+                        {testName === "Cambridge-15-Test1" && <Cambidge_15_Test1_P1_Q1 />}
+                        {testName === "Cambridge-15-Test2" && <Cambidge_15_Test2_P1_Q1 />}
+                        {testName === "Cambridge-15-Test3" && <Cambidge_15_Test3_P1_Q1 />}
+                        {testName === "Cambridge-15-Test4" && <Cambidge_15_Test4_P1_Q1 />}
+
+
+                    </div>
+                    <div style={{ display: mobilePanel1Pages ? "none" : "initial" }}>
+                        {testName.includes("Actual-Test-1") && <Test1Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-2") && <Test2Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-3") && <Test3Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-4") && <Test4Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-5") && <Test5Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-6") && <Test6Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-7") && <Test7Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-8") && <Test8Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-9") && <Test9Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-10") && <Test10Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-11") && <Test11Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-12") && <Test12Panel2_Page1 handleChange={handleChange} UserData={UserData} />}
+
+                        {/* Cambridge-allPages */}
+                        {testName === "Cambridge-19-Test1" && <Cambidge_19_Test1_P2_Q1 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-19-Test2" && <Cambidge_19_Test2_P2_Q1 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-19-Test3" && <Cambidge_19_Test3_P2_Q1 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-19-Test4" && <Cambidge_19_Test4_P2_Q1 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {/* Test-18 */}
+                        {testName === "Cambridge-18-Test1" && <Cambidge_18_Test1_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-18-Test2" && <Cambidge_18_Test2_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-18-Test3" && <Cambidge_18_Test3_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-18-Test4" && <Cambidge_18_Test4_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {/* Test-17 */}
+                        {testName === "Cambridge-17-Test1" && <Cambidge_17_Test1_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-17-Test2" && <Cambidge_17_Test2_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-17-Test3" && <Cambidge_17_Test3_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-17-Test4" && <Cambidge_17_Test4_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {/* Test-16 */}
+                        {testName === "Cambridge-16-Test1" && <Cambidge_16_Test1_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-16-Test2" && <Cambidge_16_Test2_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-16-Test3" && <Cambidge_16_Test3_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-16-Test4" && <Cambidge_16_Test4_P2_Q1 handleChange={handleChange} UserData={UserData} />}
+                        {/* Test-15 */}
+                        {testName === "Cambridge-15-Test1" && <Cambidge_15_Test1_P2_Q1 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-15-Test2" && <Cambidge_15_Test2_P2_Q1 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-15-Test3" && <Cambidge_15_Test3_P2_Q1 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-15-Test4" && <Cambidge_15_Test4_P2_Q1 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+
+                    </div>
+                    <button
+                        className="p-2 w-[120px] rounded text-white bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-500 hover:from-teal-500 hover:via-cyan-600 hover:to-blue-600 fixed bottom-[92px] right-1 transition-all duration-300"
+
+                        onClick={Mobilepanel1Functions}>
+                        {mobilePanel1Pages ?
+                            <p className="flex gap-2 text-[15px] font-bold text-black">
+                                <BsFillPatchQuestionFill className="text-[15px] translate-y-[6px]" />
+                                Questions</p>
+                            :
+                            <p className="flex gap-2 text-[15px] font-bold text-black">
+                                <LiaReadme className="text-[19px] translate-y-[6px]" />
+                                Passages</p>
+                        }
+                    </button>
+                </div>
+                <div className="p-4" style={{ display: ActivePanels ? "none" : "initial" }}>
+                    <div style={{ display: MobilePanel2Pages ? "initial" : "none" }}>
+                        {testName.includes("Actual-Test-1") && <Test1Panel1_Page2 />}
+                        {testName.includes("Actual-Test-2") && <Test2Panel1_Page2 />}
+                        {testName.includes("Actual-Test-3") && <Test3Panel1_Page2 />}
+                        {testName.includes("Actual-Test-4") && <Test4Panel1_Page2 />}
+                        {testName.includes("Actual-Test-5") && <Test5Panel1_Page2 />}
+                        {testName.includes("Actual-Test-6") && <Test6Panel1_Page2 />}
+                        {testName.includes("Actual-Test-7") && <Test7Panel1_Page2 />}
+                        {testName.includes("Actual-Test-8") && <Test8Panel1_Page2 />}
+                        {testName.includes("Actual-Test-9") && <Test9Panel1_Page2 />}
+                        {testName.includes("Actual-Test-10") && <Test10Panel1_Page2 />}
+                        {testName.includes("Actual-Test-11") && <Test11Panel1_Page2 />}
+                        {testName.includes("Actual-Test-12") && <Test12Panel1_Page2 />}
+
+
+                        {/* Cambridge-allPages */}
+                        {/* Test-19 */}
+                        {testName === "Cambridge-19-Test1" && <Cambidge_19_Test1_P1_Q2 />}
+                        {testName === "Cambridge-19-Test2" && <Cambidge_19_Test2_P1_Q2 />}
+                        {testName === "Cambridge-19-Test3" && <Cambidge_19_Test3_P1_Q2 />}
+                        {testName === "Cambridge-19-Test4" && <Cambidge_19_Test4_P1_Q2 />}
+                        {/* Test-18 */}
+                        {testName === "Cambridge-18-Test1" && <Cambidge_18_Test1_P1_Q2 />}
+                        {testName === "Cambridge-18-Test2" && <Cambidge_18_Test2_P1_Q2 />}
+                        {testName === "Cambridge-18-Test3" && <Cambidge_18_Test3_P1_Q2 />}
+                        {testName === "Cambridge-18-Test4" && <Cambidge_18_Test4_P1_Q2 />}
+                        {/* Test-17 */}
+                        {testName === "Cambridge-17-Test1" && <Cambidge_17_Test1_P1_Q2 />}
+                        {testName === "Cambridge-17-Test2" && <Cambidge_17_Test2_P1_Q2 />}
+                        {testName === "Cambridge-17-Test3" && <Cambidge_17_Test3_P1_Q2 />}
+                        {testName === "Cambridge-17-Test4" && <Cambidge_17_Test4_P1_Q2 />}
+                        {/* Test-16 */}
+                        {testName === "Cambridge-16-Test1" && <Cambidge_16_Test1_P1_Q2 />}
+                        {testName === "Cambridge-16-Test2" && <Cambidge_16_Test2_P1_Q2 />}
+                        {testName === "Cambridge-16-Test3" && <Cambidge_16_Test3_P1_Q2 />}
+                        {testName === "Cambridge-16-Test4" && <Cambidge_16_Test4_P1_Q2 />}
+                        {/* Test-15 */}
+                        {testName === "Cambridge-15-Test1" && <Cambidge_15_Test1_P1_Q2 />}
+                        {testName === "Cambridge-15-Test2" && <Cambidge_15_Test2_P1_Q2 />}
+                        {testName === "Cambridge-15-Test3" && <Cambidge_15_Test3_P1_Q2 />}
+                        {testName === "Cambridge-15-Test4" && <Cambidge_15_Test4_P1_Q2 />}
+
+                    </div>
+                    <div style={{ display: MobilePanel2Pages ? "none" : "initial" }}>
+                        {testName.includes("Actual-Test-1") && <Test1Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-2") && <Test2Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-3") && <Test3Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-4") && <Test4Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-5") && <Test5Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-6") && <Test6Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-7") && <Test7Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-8") && <Test8Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-9") && <Test9Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-10") && <Test10Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-11") && <Test11Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+                        {testName.includes("Actual-Test-12") && <Test12Panel2_Page2 handleChange={handleChange} UserData={UserData} />}
+
+
+                        {/* Cambridge-allPages */}
+                        {testName === "Cambridge-19-Test1" && <Cambidge_19_Test1_P2_Q2 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-19-Test2" && <Cambidge_19_Test2_P2_Q2 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-19-Test3" && <Cambidge_19_Test3_P2_Q2 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-19-Test4" && <Cambidge_19_Test4_P2_Q2 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+
+                        {testName === "Cambridge-18-Test1" && <Cambidge_18_Test1_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-18-Test2" && <Cambidge_18_Test2_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-18-Test3" && <Cambidge_18_Test3_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-18-Test4" && <Cambidge_18_Test4_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+
+                        {testName === "Cambridge-17-Test1" && <Cambidge_17_Test1_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-17-Test2" && <Cambidge_17_Test2_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-17-Test3" && <Cambidge_17_Test3_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-17-Test4" && <Cambidge_17_Test4_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {/* Test-16 */}
+                        {testName === "Cambridge-16-Test1" && <Cambidge_16_Test1_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-16-Test2" && <Cambidge_16_Test2_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-16-Test3" && <Cambidge_16_Test3_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {testName === "Cambridge-16-Test4" && <Cambidge_16_Test4_P2_Q2 handleChange={handleChange} UserData={UserData} />}
+                        {/* Test-16 */}
+                        {testName === "Cambridge-15-Test1" && <Cambidge_15_Test1_P2_Q2 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-15-Test2" && <Cambidge_15_Test2_P2_Q2 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-15-Test3" && <Cambidge_15_Test3_P2_Q2 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                        {testName === "Cambridge-15-Test4" && <Cambidge_15_Test4_P2_Q2 handleChange={handleChange} UserData={UserData} RightAnswers={RightAnswers} />}
+                    </div>
+                    <button
+                        className="p-2 w-[120px] rounded text-white bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-500 hover:from-teal-500 hover:via-cyan-600 hover:to-blue-600 fixed bottom-[92px] right-1 transition-all duration-300"
+
+                        onClick={Mobilepanel2Functions}>
+                        {MobilePanel2Pages ?
+                            <p className="flex gap-2 text-[15px] font-bold text-black">
+                                <BsFillPatchQuestionFill className="text-[15px] translate-y-[6px]" />
+                                Questions</p>
+                            :
+                            <p className="flex gap-2 text-[15px] font-bold text-black">
+                                <LiaReadme className="text-[19px] translate-y-[6px]" />
+                                Passages</p>
+                        }
+                    </button>
+                </div>
+
+                <button
+                    className="text-black font-bold w-[120px] rounded sm:w-[100px] p-2 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 fixed bottom-[92px] left-1 transition-all duration-300"
+                    onClick={ClickActivePanels}
+                >{ActivePanels ? "Go Section-2" : "Go Section-1"}</button>
+
+            </section>
+        </div>
+    );
+};
+export default Reading;
+

@@ -1,0 +1,194 @@
+// ClickSpeakingNative.js
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Alert, ScrollView, PermissionsAndroid } from 'react-native';
+import { Audio } from 'expo-av';
+import axios from 'axios';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import { FontAwesome } from '@expo/vector-icons';
+
+const ClickSpeakingNative = ({ testNo, onFinished }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [spokenText, setSpokenText] = useState('');
+  const [statusText, setStatusText] = useState('Tap play to begin...');
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const recorderPlayer = useRef(null);
+  const [recordSecs, setRecordSecs] = useState(0);
+  const [recordTime, setRecordTime] = useState('');
+
+  const GOOGLE_API_KEY = 'AIzaSyDVksTONkieWNhplzhmpXTHCsYrjdDh1Mc';
+
+  useEffect(() => {
+    recorderPlayer.current = new AudioRecorderPlayer();
+  }, []);
+
+  const requestPermissions = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        {
+          title: 'Microphone Permission',
+          message: 'App needs access to your microphone to record audio.',
+          buttonPositive: 'OK',
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true;
+  };
+
+  const startRecording = async () => {
+    if (!recorderPlayer.current) {
+      console.error('Recorder not initialized');
+      Alert.alert('Error', 'Audio recorder not initialized');
+      return;
+    }
+
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      Alert.alert('Permission denied', 'Microphone access is required.');
+      return;
+    }
+
+    try {
+      setStatusText('Recording...');
+      const result = await recorderPlayer.current.startRecorder();
+
+      recorderPlayer.current.addRecordBackListener((e) => {
+        setRecordSecs(e.currentPosition);
+        setRecordTime(recorderPlayer.current.mmssss(Math.floor(e.currentPosition)));
+        return;
+      });
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Failed to start recording:', err);
+      Alert.alert('Error', 'Could not start recording');
+    }
+  };
+
+  const stopRecording = async () => {
+    if (!recorderPlayer.current) {
+      console.error('Recorder not initialized');
+      return;
+    }
+
+    try {
+      setStatusText('Stopping...');
+      const result = await recorderPlayer.current.stopRecorder();
+      recorderPlayer.current.removeRecordBackListener();
+      setIsRecording(false);
+      setRecordSecs(0);
+
+      const processedUri = Platform.OS === 'ios' ? result.replace('file://', '') : result;
+      sendAudioToGoogleAPI(processedUri);
+    } catch (err) {
+      console.error('Failed to stop recording:', err);
+      Alert.alert('Error', 'Could not stop recording');
+    }
+  };
+
+  const sendAudioToGoogleAPI = async (uri) => {
+    try {
+      const response = await fetch(uri);
+      if (!response.ok) throw new Error(`Fetch failed with status: ${response.status}`);
+
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = async () => {
+        const base64data = reader.result.split(',')[1];
+        const result = await axios.post(
+          `https://speech.googleapis.com/v1/speech:recognize?key=${GOOGLE_API_KEY}`,
+          {
+            config: {
+              encoding: 'LINEAR16',
+              sampleRateHertz: 44100,
+              languageCode: 'en-US',
+            },
+            audio: {
+              content: base64data,
+            },
+          }
+        );
+
+        if (result.data.results) {
+          const text = result.data.results.map(r => r.alternatives[0].transcript).join(' ');
+          setSpokenText(text);
+          setStatusText('You spoke:');
+        } else {
+          setSpokenText('');
+          setStatusText('No speech detected.');
+        }
+      };
+    } catch (error) {
+      console.error('Transcription error:', error);
+      setStatusText('Transcription failed.');
+    }
+  };
+
+  const handlePress = async () => {
+    if (isRecording) {
+      await stopRecording();
+    } else {
+      await startRecording();
+    }
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Speaking Section - {testNo}</Text>
+
+      <TouchableOpacity style={styles.button} onPress={handlePress}>
+        <FontAwesome
+          name={isRecording ? 'pause-circle' : 'play-circle'}
+          size={70}
+          color={isRecording ? '#EF4444' : '#1D4ED8'}
+        />
+      </TouchableOpacity>
+
+      <Text style={styles.status}>{statusText}</Text>
+
+      <View style={styles.transcriptBox}>
+        <Text style={styles.transcript}>{spokenText || 'Your speech will appear here.'}</Text>
+      </View>
+    </ScrollView>
+  );
+};
+
+export default ClickSpeakingNative;
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#F3F4F6',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  button: {
+    marginBottom: 20,
+  },
+  status: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#374151',
+  },
+  transcriptBox: {
+    backgroundColor: '#FFF',
+    padding: 15,
+    borderRadius: 10,
+    width: '100%',
+    minHeight: 120,
+    elevation: 4,
+  },
+  transcript: {
+    fontSize: 14,
+    color: '#111827',
+  },
+});
+  

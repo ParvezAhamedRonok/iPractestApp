@@ -1,0 +1,90 @@
+"use client"
+import React, { useEffect, useState } from 'react';
+import { useStateContext } from "@/contexts/ContextProvider";
+import Axios from "axios";
+import { AAMARPAY_GET_USER_DATA_FROM_DATABASE, PAYPAL_GET_USER_DATA_FROM_DATABASE, SSL_COMMERZ_GET_USER_DATA_FROM_DATABASE } from "@assets/URL's/AllUrl";
+
+// END OF THE IMPORTING.....
+
+export const CheckPaymentStatus = () => {
+    const { userPaymentStatusCheck, setuserPaymentStatusCheck } = useStateContext();
+    const [userEmail, setuserEmail] = useState('');
+
+    useEffect(() => {
+        const email = localStorage.getItem("userEmail");
+        setuserEmail(email);
+
+        // Get the current reload count from localStorage or initialize it to 0 if not set
+        let reloadCount = Number(localStorage.getItem('reloadCount')) || 0;
+
+        // Get the timestamp of the last reload attempt or set it to the current time if not available
+        let reloadTimestamp = Number(localStorage.getItem('reloadTimestamp')) || Date.now();
+
+        /* 
+           Step 1: Check if 24 hours (1 day) have passed since the last reload timestamp.
+           - Date.now() gives the current time in milliseconds.
+           - 24 * 60 * 60 * 1000 represents 24 hours in milliseconds.
+        */
+        if (Date.now() - reloadTimestamp > 24 * 60 * 60 * 1000) {
+            // If more than 24 hours have passed, reset the reload count and timestamp
+            localStorage.removeItem('reloadCount');
+            localStorage.removeItem('reloadTimestamp');
+            reloadCount = 0; // Reset the reload count to 0
+        }
+
+        /* 
+           Step 2: Set a timeout to check `CountryInfo` in localStorage after 2500ms (2.5 seconds).
+        */
+        setTimeout(() => {
+            // Check if 'CountryInfo' does not exist in localStorage and reload attempts are less than 3
+            if (!localStorage.getItem("CountryInfo") && reloadCount < 3) {
+                reloadCount++; // Increment the reload count
+                localStorage.setItem('reloadCount', reloadCount); // Save updated reload count
+                localStorage.setItem('reloadTimestamp', Date.now()); // Update the timestamp
+                window.location.reload(); // Reload the page
+            }
+            // If reload attempts have reached 3, show a warning
+            else if (reloadCount >= 3) {
+                console.warn("Maximum reload attempts reached.");
+            }
+        }, 2500);
+
+
+    }, []);
+
+    useEffect(() => {
+        const fetchPaymentStatus = (url, callback) => {
+            Axios({
+                method: "get",
+                url: url + localStorage.getItem("userEmail"),
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("loginTOken")}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((res) => {
+                    console.log(res);
+                    if (res.data.data && res.data.data.length > 0) {
+                        res.data.data.forEach((user) => {
+                            if (!user.isExpire) {
+                                callback(user.productName);
+                            }
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    if (error.response?.data.message === "Unauthorized!") {
+                        ["userName", "userEmail", "loginTOken", "setCountry", "setCountryFlag"].forEach(item => localStorage.removeItem(item));
+                        if (userEmail) window.location.reload(false);
+                    }
+                });
+        };
+
+        fetchPaymentStatus(SSL_COMMERZ_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
+        fetchPaymentStatus(AAMARPAY_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
+        fetchPaymentStatus(PAYPAL_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
+    }, [userEmail, setuserPaymentStatusCheck]);
+
+    return null;
+};

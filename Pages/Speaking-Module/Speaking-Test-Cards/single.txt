@@ -1,0 +1,106 @@
+
+import React, { useState } from "react";
+import { View, Text, Image, TouchableOpacity } from "react-native";
+
+export default function Single_Card({ useremail, redirect_func, test_card_image, rating, count_peoples, Title, test_Scores, sectionNames }) {
+    const [userPaymentStatusCheck, setuserPaymentStatusCheck] = useState(false)
+
+
+    return (
+        <>
+            <TouchableOpacity onPress={redirect_func} className="w-full px-2 mt-2">
+                <View className="flex flex-col justify-center relative ">
+                    <View
+                        className={`${rating.includes("test-1") ? "bg-white " : "bg-[#FFF7F7] "} relative flex flex-row  rounded-xl shadow-xl w-full border border-white  sha p-1`}>
+
+                        <View className="w-1/3 grid place-items-center ">
+                            <Image alt={Title} src={test_card_image} className="rounded-xl h-[78%]" />
+                        </View>
+                        <View className={`w-2/3 ${rating.includes("test-1") ? "bg-white " : "bg-[#FFF7F7] "} flex flex-col space-y-3 pt-2 translate-y-[-3px] sm:translate-y-[0px]`}>
+                            <View className="flex justify-center gap-2 item-center">
+                                {/* <p className="text-gray-500 font-medium ">Vacations</p> */}
+                                <View className="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <p className="text-gray-600 flex font-bold text-sm ml-1 text-[11px]">
+                                        <span className='font-bold text-sm ml-1 text-[11px] '>{parseInt(rating)}</span>
+                                    </p>
+                                </View>
+                                <View className="flex items-center">
+                                    <View className="flex ">
+                                        <Image src="https://randomuser.me/api/portraits/men/32.jpg"
+                                            alt="speaking man-img-1"
+                                            className='rounded-[50%]'
+                                            width={10}
+                                            height={10}
+                                        />
+                                        <Image
+                                            src="https://randomuser.me/api/portraits/women/44.jpg"
+                                            alt="speaking man-img-2"
+                                            className=' rounded-[50%] translate-x-[-3px]'
+                                            width={8}
+                                            height={8}
+                                        />
+                                        <Image src="https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=3759e09a5b9fbe53088b23c615b6312e"
+                                            alt="speaking man-img-3"
+                                            className='rounded-[50%] translate-x-[-3px]'
+                                            width={7}
+                                            height={7}
+                                        />
+                                    </View>
+                                    <p className="text-gray-600 font-bold text-sm ml-1">
+                                        {count_peoples}
+                                    </p>
+                                </View>
+                            </View>
+                            <h6 className="font-black text-gray-800 text-[10px] text-center">{Title}</h6>
+                            <View className='flex justify-center gap-3 w-full '>
+                                <View className='grid justify-center align-middle translate-y-[1px]'>
+                                    <View className='m-auto'>
+                                        {
+                                            test_Scores[0] ?
+                                                <>
+                                                    {
+                                                        useremail && <View className={`text-center rounded-[50%]  font-bold text-[14px] pt-[2px] outline outline-3 h-[25px] w-[25px] outline-offset-2 outline-gray-500
+                                                                                       ${Number(test_Scores[test_Scores.length - 1].ieltsScore) < 4 && "bg-red-600 text-white"}
+
+                                                                                     ${Number(test_Scores[test_Scores.length - 1].ieltsScore) >= 4 && Number(test_Scores[test_Scores.length - 1].ieltsScore) <= 6 && "bg-yellow-500 text-black"}
+
+                                                                                     ${Number(test_Scores[test_Scores.length - 1].ieltsScore) > 6 && "bg-green-600 text-white"} `} >
+                                                            {Number(test_Scores[test_Scores.length - 1].ieltsScore)}
+                                                        </View>
+                                                    }
+
+                                                </>
+
+                                                :
+                                                <View className='text-center rounded-[50%] bg-white text-black font-bold text-[15px] outline outline-3 outline-offset-2 outline-gray-500'>0</View>
+
+                                        }
+                                        <p className='text-center text-[8px]'>Score</p>
+                                    </View>
+                                </View>
+                                <button className='p-2 h-[32px] pt-[-1px] flex gap-1 jutify-center text-[11px] translate-y-[-2px] rounded-[15px] bg-gradient-to-r from-blue-600 to-green-500 hover:from-green-600 hover:to-blue-600 focus:outline-none text-white'>
+                                    {
+                                        !userPaymentStatusCheck && !rating.includes("test-1") && <PiCrownSimpleThin
+                                            className='text-white text-xl translate-y-[-2px] p-1 font-extrabold rounded-full text-center 
+                                            bg-gradient-to-r from-yellow-300 via-yellow-400 to-red-500 shadow-md'
+                                        />
+                                    }
+                                    Section {sectionNames}
+
+                                </button>
+
+
+                            </View>
+                        </View>
+                    </View>
+
+                </View>
+            </TouchableOpacity>
+        </>
+    )
+}
