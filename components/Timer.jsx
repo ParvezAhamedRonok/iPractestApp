@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timerText: {
-    fontSize: 20,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#000',
     // You can add animation styles here if you want

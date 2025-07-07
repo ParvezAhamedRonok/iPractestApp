@@ -29,14 +29,14 @@ import {
 //   Needto_login_button_cond_Then_give_access,
 //   Check_cond_after_login_for_Give_access_in_all_evaluation,
 // } from '../AllFunctions';
-import { Post_to_save_data_in_databse } from "../AllFunctions/Post-To-Save-data-in-Database";
+import { postToSaveDataInDatabase } from "../AllFunctions/Post-To-Save-data-in-Database";
 import { Check_duplicate_words } from "../AllFunctions/Check_duplicate_words";
 import { Needto_login_button_cond_Then_give_access } from "../AllFunctions/Needto_login_button_cond_Then_give_access";
 import { Check_cond_after_login_for_Give_access_in_all_evaluation } from "../AllFunctions/Check_cond_after_login_for_Give_access_in_all_evaluation";
 
 import QuestionUpload from './QuestionUpload';
 import UploadImageSection from "./_perfect-Codes/uploadImgsSec"
-// import ResultPopUp from './ResultPopup';
+import ResultPopUp from './ResultPopup';
 
 let ImageArray = [];
 let userTextToPassResultEvaluation;
@@ -54,6 +54,7 @@ export default function WritingTextArea({ task }) {
     setOpenClose_LogSign_Popup,
     functionQueue,
     registerFunction, // assume this exists
+    setGlobal_Msz_showing
   } = useStateContext();
 
   // All states carried over
@@ -157,85 +158,146 @@ export default function WritingTextArea({ task }) {
   };
 
   const checkWritingAnswer = async (text) => {
-    userTextToPassResultEvaluation = text;
-    setGlobal_Msz_showing('Checking...');
-    let taskScore = '';
-    if (storeQuestionText) {
-      try {
-        const r = await fetch(WRITING_POST_GET_COHERENCE_SCORES_AFTER_EVALUATION, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ questions: storeQuestionText, answers: text }),
-        });
-        const data = await r.json();
-        const first = Number(RegExp.$1 = data.message.match(/(\d+)/)?.[1] ?? 0);
-        taskScore = first < 4 ? 5 : first <= 6 ? first + 1 : first;
-        setMainTaskComplessionResult(taskScore);
-      } catch {
-        setMainTaskComplessionResult('error');
-      }
-    }
+    try {
 
-    setLoadingGlobally(true);
-    setTimeout(async () => {
-      try {
-        const r = await fetch(WRITING_POST_CHECK_ANSWER, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputs: text }),
-        });
-        const data = await r.json();
-        if (getUserWritinNo) {
-          await AsyncStorage.setItem('WritingNo', String(getUserWritinNo + 1));
-        } else {
-          await AsyncStorage.setItem('WritingNo', '1');
+      userTextToPassResultEvaluation = text;
+      setGlobal_Msz_showing('Checking...');
+      console.log(userLoginToken)
+      let taskScore = '';
+
+      if (storeQuestionText) {
+        Alert.alert('Question Uploaded...');
+        try {
+          const response = await fetch(WRITING_POST_GET_COHERENCE_SCORES_AFTER_EVALUATION, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              questions: storeQuestionText,
+              answers: text,
+            }),
+          });
+
+          const data = await response.json();
+
+          Alert.alert('Completed scoring...');
+
+          const match = data.message.match(/(\d+)/);
+          const first = match ? Number(match[1]) : 0;
+          taskScore = first < 4 ? 5 : first <= 6 ? first + 1 : first;
+
+          setMainTaskComplessionResult(taskScore);
+        } catch (err) {
+          console.error('Error in task score fetch:', err);
+          Alert.alert('Error occurred during scoring.');
+          setMainTaskComplessionResult('error');
         }
-        setRepeatedWords(repeatedWordScore(text));
-        setSubOrdinateWord(Check_duplicate_words(text));
-        const r2 = await fetch('https://ipractest-406204.uc.r.appspot.com/writingCorrection/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ textData: text }),
-        });
-        const d2 = await r2.json();
-        setLoadingGlobally(false);
-        Check_cond_after_login_for_Give_access_in_all_evaluation(
-          changeTap,
-          userPaymentStatusCheck,
-          setstoreTapContentForChangeUI,
-          userTextToPassResultEvaluation,
-          setSpeakingImprovement,
-          setSpeakingSummary,
-          setlexicalResWords,
-          setgrammerMistakes,
-        );
-        setCorrectData(d2.message.replace(/['"]+/g, '').replace(/\\n/g, ' '));
-        const totalRaw = (
-          Number(data.GrammaticalScore) +
-          Number(data.LexicalResourceScore) +
-          Number(data.CoherenceScore) +
-          (taskScore ? Number(taskScore) : 0)
-        ) / (taskScore ? 4 : 3);
-        const rounded = Math.round(Number(totalRaw.toFixed(1)) * 2) / 2;
-        setpostIeltsRate(rounded);
-        setLexicalResourceScore(data.LexicalResourceScore);
-        setGeammarScore(data.GrammaticalScore);
-        setCoherenceScore(data.CoherenceScore);
-        Making_TOEFL_Scroes(rounded);
-        Post_to_save_data_in_databse(
-          data,
-          rounded,
-          userLoginToken,
-          userLoginName,
-          useremail,
-          MainTaskComplessionResult,
-          GetFullPathName
-        );
-      } catch {
-        setLoadingGlobally(false);
-        Alert.alert('Server Error, please try again later.');
       }
-    }, 2500);
+
+      setLoadingGlobally(true);
+
+      setTimeout(async () => {
+        try {
+          Alert.alert('Starting...');
+          console.log(text);
+
+          // First API call
+          const res = await fetch(WRITING_POST_CHECK_ANSWER, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inputs: text }),
+          });
+
+          if (!res.ok) {
+            const errorHtml = await res.text();
+            throw new Error(`WRITING_POST_CHECK_ANSWER failed: ${res.status} - ${errorHtml}`);
+          }
+
+          const data = await res.json();
+          console.log("1st response ---->", data);
+
+          // WritingNo Save
+          if (getUserWritinNo) {
+            await AsyncStorage.setItem('WritingNo', String(getUserWritinNo + 1));
+          } else {
+            await AsyncStorage.setItem('WritingNo', '1');
+          }
+
+          // Repeated Words
+          setRepeatedWords(repeatedWordScore(text));
+
+          // Check Duplicates — you can safely call this now
+          setSubOrdinateWord(Check_duplicate_words(text));
+
+          // Second API call
+          const res2 = await fetch('https://ipractest-406204.uc.r.appspot.com/writingCorrection/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ textData: text }),
+          });
+
+          if (!res2.ok) {
+            const errorHtml = await res2.text();
+            throw new Error(`writingCorrection failed: ${res2.status} - ${errorHtml}`);
+          }
+
+          const d2 = await res2.json();
+          console.log("Second Response ====>", d2.message);
+
+
+
+          // Final Logic
+          Check_cond_after_login_for_Give_access_in_all_evaluation(
+            changeTap,
+            userPaymentStatusCheck,
+            setstoreTapContentForChangeUI,
+            userTextToPassResultEvaluation,
+            setSpeakingImprovement,
+            setSpeakingSummary,
+            setlexicalResWords,
+            setgrammerMistakes,
+          );
+
+          setCorrectData(d2.message.replace(/['"]+/g, '').replace(/\\n/g, ' '));
+
+          const totalRaw = (
+            Number(data.GrammaticalScore) +
+            Number(data.LexicalResourceScore) +
+            Number(data.CoherenceScore) +
+            (taskScore ? Number(taskScore) : 0)
+          ) / (taskScore ? 4 : 3);
+
+          const rounded = Math.round(totalRaw * 2) / 2;
+
+          setpostIeltsRate(rounded);
+          setLexicalResourceScore(data.LexicalResourceScore);
+          setGeammarScore(data.GrammaticalScore);
+          setCoherenceScore(data.CoherenceScore);
+
+          Making_TOEFL_Scroes(rounded);
+
+          useremail && postToSaveDataInDatabase(
+            data,
+            rounded,
+            userLoginToken,
+            userLoginName,
+            useremail,
+            taskScore,
+            GetFullPathName
+          );
+          
+          setLoadingGlobally(false);
+          alert("✅ Evaluation Done!");
+        } catch (err) {
+          console.error('💥 Main evaluation error:', err);
+          setLoadingGlobally(false);
+          Alert.alert('Server Error', err.message || 'Please try again later.');
+        }
+      }, 500);
+
+    } catch (err) {
+      console.error('Unexpected outer error:', err);
+      Alert.alert('Unexpected error occurred.');
+    }
   };
 
   const uploadImageGCP = async () => {
@@ -348,42 +410,57 @@ export default function WritingTextArea({ task }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      {changeImageUI ? (
-        <View style={styles.textAreaContainer}>
-          <TextInput
-            multiline
-            style={styles.textArea}
-            value={imageText}
-            scrollEnabled={true}
-            numberOfLines={8}
-            placeholder="Write here..."
-            onChangeText={setIgameText}
-          />
-          <Text style={styles.wordCount}>
-            {imageText.split(' ').filter(Boolean).length} words
-          </Text>
-          <Button
+    <>
+      <ScrollView style={styles.container}>
+        {changeImageUI ? (
+          <View style={styles.textAreaContainer}>
+            <TextInput
+              multiline
+              style={styles.textArea}
+              value={imageText}
+              scrollEnabled={true}
+              numberOfLines={8}
+              placeholder="Write here..."
+              onChangeText={setIgameText}
+            />
+            <Text style={styles.wordCount}>
+              {imageText.split(' ').filter(Boolean).length} words
+            </Text>
+            <TouchableOpacity style={styles.convertButton} onPress={afterConvertedImageIntoText}>
+              <Ionicons name="heart" size={20} color="white" />
+              <Text style={styles.convertText}>Writing Evaluation</Text>
+            </TouchableOpacity>
+            {/* <Button
             title="Writing Evaluation"
             color="#333"
             onPress={afterConvertedImageIntoText}
-          />
-        </View>
-      ) : (
-        <View style={styles.textAreaContainer}>
-          <TextInput
-            multiline
-            style={styles.textArea}
-            scrollEnabled={true}
-            numberOfLines={8}
-            placeholder="Write here..."
-            onChangeText={text => setWritingData({ writinTextArea: text })}
-            value={writingData.writinTextArea}
-          />
-          <Text style={styles.wordCount}>
-            {writingData.writinTextArea.trim().split(/\s+/).filter(Boolean).length} Words
-          </Text>
-          <Button
+          /> */}
+          </View>
+        ) : (
+          <View style={styles.textAreaContainer}>
+            <TextInput
+              multiline
+              style={styles.textArea}
+              scrollEnabled={true}
+              numberOfLines={8}
+              placeholder="Write here..."
+              onChangeText={text => setWritingData({ writinTextArea: text })}
+              value={writingData.writinTextArea}
+            />
+            <Text style={styles.wordCount}>
+              {writingData.writinTextArea.trim().split(/\s+/).filter(Boolean).length} Words
+            </Text>
+            <TouchableOpacity style={styles.convertButton}
+              onPress={
+                Number(getUserWritinNo) >= 11
+                  ? handleLogInPageForWrite
+                  : handleWritingSubmit
+              }
+            >
+              <Ionicons name="heart" size={20} color="white" />
+              <Text style={styles.convertText}>Writing Evaluation</Text>
+            </TouchableOpacity>
+            {/* <Button
             title="Writing Evaluation"
             color="#000"
             onPress={
@@ -391,21 +468,27 @@ export default function WritingTextArea({ task }) {
                 ? handleLogInPageForWrite
                 : handleWritingSubmit
             }
-          />
-        </View>
-      )}
+          /> */}
+          </View>
+        )}
 
-      <QuestionUpload setStoreQuestionText={setStoreQuestionText} />
+        <QuestionUpload setStoreQuestionText={setStoreQuestionText} />
 
-      <UploadImageSection
-        getUserWritinNo={getUserWritinNo}
-        setGetUserGritingNo={setGetUserGritingNo}
-        setIgameText={setIgameText}
-        setitemsSet={setitemsSet}
-        setChangeImageUI={setChangeImageUI}
-      />
+        <UploadImageSection
+          getUserWritinNo={getUserWritinNo}
+          setGetUserGritingNo={setGetUserGritingNo}
+          setIgameText={setIgameText}
+          setitemsSet={setitemsSet}
+          setChangeImageUI={setChangeImageUI}
+        />
 
-      {/* <ResultPopUp
+
+        {/* {(isloading || LoadingGlobally) && (
+        <ActivityIndicator size="large" color="#800080" style={{ margin: 20 }} />
+      )} */}
+      </ScrollView>
+
+      <ResultPopUp
         correctData={correctData}
         setCorrectData={setCorrectData}
         setOpen_MarketingOffer={setOpen_MarketingOffer}
@@ -430,12 +513,9 @@ export default function WritingTextArea({ task }) {
         LoadingGlobally={LoadingGlobally}
         SpeakingSummary={SpeakingSummary}
         SpeakingImprovement={SpeakingImprovement}
-      /> */}
+      />
 
-      {/* {(isloading || LoadingGlobally) && (
-        <ActivityIndicator size="large" color="#800080" style={{ margin: 20 }} />
-      )} */}
-    </ScrollView>
+    </>
   );
 }
 
@@ -473,5 +553,18 @@ const styles = StyleSheet.create({
     height: 75,
     borderRadius: 15,
     margin: 5,
+  },
+  //button styling..
+  convertButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 20,
+  },
+  convertText: {
+    color: 'white',
+    marginLeft: 5,
+    fontSize: 14,
   },
 });

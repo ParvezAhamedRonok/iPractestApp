@@ -1,23 +1,38 @@
-import React from "react";
-import { MdOutlineCancel } from "react-icons/md";
-import { IoMdLogIn } from "react-icons/io";
-import { FaChessQueen } from "react-icons/fa";
-import Image from "next/image";
-import AnimatedProgressProvider from "@/components/Speaking-Module/Speaking-main/Pages/SpeakingResult/AnimatedProgressProvider.js";
-import ResultEvaluations from "./ResultEvaluations";
-import Compare from "./Compare";
-import logo from "@assets/images/Practestlogo.png";
-import { ClockLoader } from "react-spinners";
-import Timer from "./Timer";
-import { useRouter } from "next/navigation";
-import ResultImprovement from "./ResultImprovement.jsx";
-import {
-    CircularProgressbar,
-    CircularProgressbarWithChildren,
-    buildStyles
-} from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-import { easeQuadInOut } from "d3-ease";
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
+const { width, height } = Dimensions.get('window');
+// import { MdOutlineCancel } from "react-icons/md";
+// import { IoMdLogIn } from "react-icons/io";
+// import { FaChessQueen } from "react-icons/fa";
+
+// import AnimatedProgressProvider from "@/components/Speaking-Module/Speaking-main/Pages/SpeakingResult/AnimatedProgressProvider.js";
+// import ResultEvaluations from "./ResultEvaluations";
+// import Compare from "./Compare";
+// import { useRouter } from "next/navigation";
+// import ResultImprovement from "./ResultImprovement.jsx";
+// import {
+//     CircularProgressbar,
+//     CircularProgressbarWithChildren,
+//     buildStyles
+// } from "react-circular-progressbar";
+// import "react-circular-progressbar/dist/styles.css";
+// import { easeQuadInOut } from "d3-ease";
+
+
+// for cyrcular bar 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+const RADIUS = 35;
+const STROKE_WIDTH = 8;
+const CIRCLE_LENGTH = 2 * Math.PI * RADIUS;
+
+//width bars..
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const BAR_WIDTH = SCREEN_WIDTH * 0.42; // About 42% of screen for each bar (2 per row with gap)
+
+
+
 
 export default function ResultPopup({ correctData,
     setCorrectData,
@@ -40,239 +55,443 @@ export default function ResultPopup({ correctData,
     userTextToPassResultEvaluation,
     lexicalResWords,
     grammerMistakes, LoadingGlobally, SpeakingSummary, SpeakingImprovement }) {
-    const history = useRouter()
+    // const history = useRouter();
+    if (!correctData) return null;
+
+    //for animated cyrcular bar for IELTS and TOFEL scoring 
+    const animatedIELTS = useState(new Animated.Value(CIRCLE_LENGTH))[0];
+    const animatedTOEFL = useState(new Animated.Value(CIRCLE_LENGTH))[0];
+
+    useEffect(() => {
+        const ieltsTarget =
+            CIRCLE_LENGTH - (CIRCLE_LENGTH * Number(postIeltsRate)) / 9; // Max IELTS = 9
+
+        Animated.timing(animatedIELTS, {
+            toValue: ieltsTarget,
+            duration: 1500,
+            useNativeDriver: true,
+        }).start();
+
+        const toeflTarget =
+            CIRCLE_LENGTH - (CIRCLE_LENGTH * Number(TOELF_Score)) / 30; // Max TOEFL = 30
+
+        Animated.timing(animatedTOEFL, {
+            toValue: toeflTarget,
+            duration: 1500,
+            useNativeDriver: true,
+        }).start();
+    }, [postIeltsRate, TOELF_Score]);
+    // width range bar ...
+    const getWidth = (val, max = 10) =>
+        `${(Number(val) / max) * 100}%`;
+
+    // alert(typeof MainTaskComplessionResult)
+    const isError = MainTaskComplessionResult === 'error' || " ";
+    const isZero = MainTaskComplessionResult === '0';
+
     return (
-        <div className="Result-PopUp">
-            {correctData && (
-                <section
-                    className="fixed top-0 left-0 right-0 bottom-0 w-[100%]  box-border overflow-y-scroll  h-[99vh]
-        bg-neutral-100 text-black z-[100000] grid-cols-1 grid-rows-5">
-                    {/*  showing IELT's Rate base on Writing   */}
-                    <div className="w-full h-full relative">
-                        <div className="absolute top-5 right-5">
-                            <button
-                                style={{ color: 'rgb(153, 171, 180)' }}
-                                className="text-3xl  hover:drop-shadow-xl rounded-[50%] pt-[13px] sm:mr-5 mr-1
-                         hover:bg-light-gray w-[60px] translate-y-[-17px] sm:translate-y-[-14px] h-[60px] flex justify-center align-middle"
-                                onClick={() => {
-                                    setCorrectData(false);
-                                    //for openiging the offer popup ...
-                                    setOpen_MarketingOffer(prev => !prev)
-                                }}>  <MdOutlineCancel />
-                            </button>
-                        </div>
+        <View style={styles.overlay}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => { setCorrectData(false) }}>
+                <Text style={styles.closeText}>✕</Text>
+            </TouchableOpacity>
+            {/* all result scoring UI Main into below */}
+            <View style={styles.container}>
+                {/* IELTS Progress Circle */}
+                <View style={styles.circleWrapper}>
+                    <Svg width={80} height={80}>
+                        <Circle
+                            cx={40}
+                            cy={40}
+                            r={RADIUS}
+                            stroke="#e6e6e6"
+                            strokeWidth={STROKE_WIDTH}
+                            fill="none"
+                        />
+                        <AnimatedCircle
+                            cx={40}
+                            cy={40}
+                            r={RADIUS}
+                            stroke="#541bac"
+                            strokeWidth={STROKE_WIDTH}
+                            fill="none"
+                            strokeDasharray={CIRCLE_LENGTH}
+                            strokeDashoffset={animatedIELTS}
+                            strokeLinecap="round"
+                        />
+                    </Svg>
+                    <View style={styles.centeredText}>
+                        <Text style={[styles.scoreLabel, { color: '#541bac' }]}>
+                            {String(Number(postIeltsRate)).split('').join('.')}
+                        </Text>
+                    </View>
+                    <Text style={styles.scoreTitle}>IELTS Score</Text>
+                </View>
+
+                {/* TOEFL Progress Circle */}
+                <View style={styles.circleWrapper}>
+                    <Svg width={80} height={80}>
+                        <Circle
+                            cx={40}
+                            cy={40}
+                            r={RADIUS}
+                            stroke="#e6e6e6"
+                            strokeWidth={STROKE_WIDTH}
+                            fill="none"
+                        />
+                        <AnimatedCircle
+                            cx={40}
+                            cy={40}
+                            r={RADIUS}
+                            stroke="blue"
+                            strokeWidth={STROKE_WIDTH}
+                            fill="none"
+                            strokeDasharray={CIRCLE_LENGTH}
+                            strokeDashoffset={animatedTOEFL}
+                            strokeLinecap="round"
+                        />
+                    </Svg>
+                    <View style={styles.centeredText}>
+                        <Text style={[styles.scoreLabel, { color: 'blue' }]}>
+                            {Number(TOELF_Score)}
+                        </Text>
+                    </View>
+                    <Text style={styles.scoreTitle}>TOEFL Score</Text>
+                </View>
+            </View>
+            <>
+                <View style={styles.wrapper}>
+                    {/* Lexical Resource */}
+                    <View style={styles.barBlock}>
+                        <View style={styles.barTextRow}>
+                            <Text style={styles.label}>Lexical</Text>
+                            <Text style={styles.scoreText}>{LexicalResourceScore}</Text>
+                        </View>
+                        <View style={styles.progressBg}>
+                            <View
+                                style={[
+                                    styles.progressFill,
+                                    { width: getWidth(LexicalResourceScore) },
+                                ]}
+                            />
+                        </View>
+                    </View>
+
+                    {/* Grammar */}
+                    <View style={styles.barBlock}>
+                        <View style={styles.barTextRow}>
+                            <Text style={styles.label}>Grammar</Text>
+                            <Text style={styles.scoreText}>{GrammarScore}</Text>
+                        </View>
+                        <View style={styles.progressBg}>
+                            <View
+                                style={[
+                                    styles.progressFill,
+                                    { width: getWidth(GrammarScore) },
+                                ]}
+                            />
+                        </View>
+                    </View>
+
+                    {/* Coherence */}
+                    <View style={styles.barBlock}>
+                        <View style={styles.barTextRow}>
+                            <Text style={styles.label}>Coherence</Text>
+                            <Text style={styles.scoreText}>{storeCoherenceScore}</Text>
+                        </View>
+                        <View style={styles.progressBg}>
+                            <View
+                                style={[
+                                    styles.progressFill,
+                                    { width: getWidth(storeCoherenceScore) },
+                                ]}
+                            />
+                        </View>
+                    </View>
+
+                    {/* Task Completion */}
+                    <View style={styles.barBlock}>
+                        <View style={styles.barTextRow}>
+                            <Text style={styles.label}>Task</Text>
+                            <Text style={styles.scoreText}>
+                                {isError ? 0 : MainTaskComplessionResult}
+                            </Text>
+                        </View>
+                        <View style={styles.progressBg}>
+                            <View
+                                style={[
+                                    styles.progressFill,
+                                    {
+                                        width:
+                                            isError || isZero
+                                                ? '0%'
+                                                : getWidth(MainTaskComplessionResult, 9),
+                                    },
+                                ]}
+                            />
+                        </View>
+                    </View>
 
 
-                        <div className="w-full flex justify-center align-middle pt-3">
-                            <div className=" mb-2">
-                                <div className="flex gap-6 justify-center align-middle">
-                                    <div className="flex gap-4">
-                                        <div className="mb-2 m-auto w-[70px] h-[70px]">
-                                            <AnimatedProgressProvider
-                                                valueStart={0}
-                                                valueEnd={Number(postIeltsRate) / 10 * 100}
-                                                duration={1.5}
-                                                easingFunction={easeQuadInOut}
-                                            // repeat
-                                            >
-                                                {value => {
-                                                    let roundedValue = Math.round(value);
-                                                    let mainNumber = String(roundedValue).split("").join(".");
-                                                    return (
-                                                        <CircularProgressbar
-                                                            value={value}
-                                                            text={`${mainNumber}`}
-                                                            strokeWidth={13}
-                                                            styles={buildStyles({
-                                                                pathTransition: "none",
-                                                                //  textColor: "red",
-                                                                pathColor: "#541bac",
-                                                                // trailColor: "gold"
-                                                            })}
-                                                            className="font-bold"
-                                                        />
-                                                    );
-                                                }}
-                                            </AnimatedProgressProvider>
-                                            <p className="text-[11px] mt-1 font-bold text-center">IELTS Score</p> <br />
-                                        </div>
-                                        <div style={{ width: "70px", height: "70px" }}>
-                                            <CircularProgressbar
-                                                value={Number(TOELF_Score)}
-                                                maxValue={30}
-                                                text={`${Number(TOELF_Score)}`}
-                                                styles={buildStyles({
-                                                    textColor: "blue",
-                                                    pathColor: "blue",
-                                                    trailColor: "#d6d6d6"
-                                                })}
-                                            />
-                                            <p className='text-center font-bold mt-1 text-[9px]'>TOEFL Score</p>
-                                        </div>
-                                    </div>
+                </View>
+                {/* Conditional Message or Button */}
+                {(isError || isZero) && (
+                    <TouchableOpacity
+                        style={styles.warningButton}
+                        onPress={() => {
 
-                                </div>
+                            clickForUploadQuestion();
+                            // alert("here be be that upload function")
+                        }}
+                    >
+                        <Text style={styles.warningText}>
+                            {isError
+                                ? 'Upload'
+                                : 'Upload Valid Question for Better Scores'}
+                        </Text>
+                    </TouchableOpacity>
+                )}
+            </>
+        </View>
+    );
+
+    // return (
+
+    //     <div className="Result-PopUp">
+    //         {correctData && (
+    //             <section
+    //                 className="fixed top-0 left-0 right-0 bottom-0 w-[100%]  box-border overflow-y-scroll  h-[99vh]
 
 
-                                <br />
-                                <div>
-                                    <div className="w-full flex gap-2 mt-2 translate-y-3 p-1">
-                                        <div>
-                                            <div className="relative w-[150px] sm:w-[210px] bg-[rgb(192,192,192)] rounded-[25px]  h-[14px] mb-1 ">
-                                                <div className="bg-blue-600 h-[14px] rounded-[25px]" style={{ width: Number(LexicalResourceScore) / 10 * 100 + "%" }}></div>
-                                                <div className="barTexts w-[150px] sm:w-[210px] flex justify-between align-middle absolute top-0 left-0">
-                                                    <div className="absolute top-[-20px] left-0 right-0 flex gap-3 translate-x-[-3px]">
-                                                        <p className='ml-2 text-black font-bold text-[11px] '>LexicalResource</p>
-                                                        <p className='font-bold text-black  mr-2 text-[15px]'>{LexicalResourceScore}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="relative mt-[17px] w-[150px] sm:w-[210px] bg-[rgb(192,192,192)] rounded-[25px]  h-[14px] mb-1">
-                                                <div className="bg-blue-600 h-[14px] rounded-[25px] " style={{ width: Number(GrammarScore) / 10 * 100 + "%" }}></div>
-                                                <div className="absolute top-[-20px] left-0 right-0 flex gap-3 translate-x-[-3px]">
-                                                    <p className='ml-2 text-black font-bold text-[11px] '>Grammar Score</p>
-                                                    <p className='font-bold text-black  mr-2 text-[15px]'>{GrammarScore}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="relative w-[150px] sm:w-[210px] bg-[rgb(192,192,192)] rounded-[25px]  h-[14px] mb-1 ">
-                                                <div className="bg-blue-600 h-[14px] rounded-[25px] " style={{ width: Number(storeCoherenceScore) / 10 * 100 + "%" }}></div>
-                                                <div className="absolute top-[-20px] left-0 right-0 flex gap-3 translate-x-[-3px]">
-                                                    <p className='ml-2 text-black font-bold text-[11px] '>Coherence</p>
-                                                    <p className='font-bold text-black  mr-2 text-[15px]'>{storeCoherenceScore}</p>
-                                                </div>
-                                            </div>
-                                            <div className="relative">
-                                                <div >
-                                                    <div className="relative mt-[17px] w-[150px] sm:w-[210px] bg-[rgb(192,192,192)] rounded-[25px]  h-[14px] mb-1 ">
-                                                        <div className="bg-blue-600 h-[14px] rounded-[25px]" style={{ width: MainTaskComplessionResult != "error" ? Number(MainTaskComplessionResult) / 9 * 100 + "%" : Number(0) }}></div>
-                                                        <div className="absolute top-[-20px] left-0 right-0 flex gap-3 translate-x-[-3px]">
-                                                            <p className='ml-2 text-black font-bold text-[11px]'>Task Completion</p>
-                                                            <p className='font-bold text-black  mr-2 text-[15px] '>{MainTaskComplessionResult == "error" ? 0 : MainTaskComplessionResult}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="absolute bottom-[-25px] right-0 pr-1">
-                                                    <div className="flex gap-1">
-                                                        <>
-                                                            <p className="text-[8px] sm:text-[9px] text-red-600 translate-y-[2px] leading-[10px]">{MainTaskComplessionResult == "error" && "Upload Question For Getting Those Scores"}</p>
-                                                            <p className="text-[8px] sm:text-[9px] text-red-600 translate-x-[-6px] sm:translate-x-[-10px] translate-y-[-5px]">{MainTaskComplessionResult == "0" && "Upload valid Question For Getting better Score"}</p>
-                                                        </>
-
-                                                        {
-                                                            MainTaskComplessionResult == "error" && <button className="text-[9px] p-1 rounded-[12px] text-center bg-red-400 hover:bg-blue-500 text-white"
-                                                                onClick={() => { clickForUploadQuestion() }}
-                                                            >Upload</button>
-                                                        }
-                                                    </div>
-                                                </div>
-
-                                            </div> <br />
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    //                                     </div>
+    //                                 </div>
+    //                             </div>
+    //                         </div>
+    //                     </div>
 
 
-                        {/* all tabs */}
-                        <div className='bg-[##eaeaea] sm:mr-3 sm:ml-3 w-full border-b-[3px] border-b-[#20bbb7]' >
-                            <ul className='flex cursor-pointer gap-1 sm:gap-2 justify-center'>
-                                <li className={`${changeTap == "Correction" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2 px-2 sm:px-6 rounded-t-lg   text-[8px] sm:text-[14px] font-bold`}
-                                    onClick={() => { setChangeTap("Correction") }}
-                                >Writing Correction</li>
-                                <li className={`${changeTap == "Evaluation" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2  px-2 sm:px-6 rounded-t-lg  text-[8px] sm:text-[14px] font-bold`}
-                                    onClick={() => {
-                                        setChangeTap("Evaluation")
-                                    }}
-                                >Result Evaluation</li>
-                                <li className={`${changeTap == "Improvement" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2  px-2 sm:px-6  rounded-t-lg text-[8px] sm:text-[14px] font-bold`}
-                                    onClick={() => {
-                                        setChangeTap("Improvement")
-                                    }}
-                                >Area of Improvement</li>
+    //                     {/* all tabs */}
+    //                     <div className='bg-[##eaeaea] sm:mr-3 sm:ml-3 w-full border-b-[3px] border-b-[#20bbb7]' >
+    //                         <ul className='flex cursor-pointer gap-1 sm:gap-2 justify-center'>
+    //                             <li className={`${changeTap == "Correction" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2 px-2 sm:px-6 rounded-t-lg   text-[8px] sm:text-[14px] font-bold`}
+    //                                 onClick={() => { setChangeTap("Correction") }}
+    //                             >Writing Correction</li>
+    //                             <li className={`${changeTap == "Evaluation" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2  px-2 sm:px-6 rounded-t-lg  text-[8px] sm:text-[14px] font-bold`}
+    //                                 onClick={() => {
+    //                                     setChangeTap("Evaluation")
+    //                                 }}
+    //                             >Result Evaluation</li>
+    //                             <li className={`${changeTap == "Improvement" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2  px-2 sm:px-6  rounded-t-lg text-[8px] sm:text-[14px] font-bold`}
+    //                                 onClick={() => {
+    //                                     setChangeTap("Improvement")
+    //                                 }}
+    //                             >Area of Improvement</li>
 
-                            </ul>
-                        </div>
+    //                         </ul>
+    //                     </div>
 
-                        {/* Showing the Right & Wrong Writing by HightLight  */}
-                        <div className="border-r-2 border-r-gray-300 border-l-2 border-l-gray-300 border-b-2 border-b-gray-300 sm:pl-3 sm:pr-3">
-                            {
-                                changeTap == "Correction" && (
-                                    <Compare
-                                        itemsSet={itemsSet}
-                                        imageText={imageText}
-                                        writingData={writingData.writinTextArea}
-                                        correctData={correctData}
-                                    />
-                                )
-                            }
-                            <div className="w-full h-full relative z-[100]">
-                                {
-                                    changeTap != "Correction" && (<>
-                                        {
-                                            storeTapContentForChangeUI == "LoginFirst" && (
-                                                < div className="absolute top-0 left-0 right-0  flex justify-center setBackgroundColorsInResultPremium align-middle w-full h-full z-[1000]">
-                                                    <div className="w-full h-[250px] bg-transparent translate-y-3 flex justify-center align-middle m-4 ">
-                                                        <button className="p-2 text-center m-auto text-white rounded-[10px] font-bold h-[40px] bg-blue-600 flex gap-2"
-                                                            onClick={() => {
-                                                                userLoginFunction();
-                                                                setchange_login_Status(false);
-                                                            }}
-                                                        >Need to Login <IoMdLogIn className="text-xl translate-y-[2px]" /></button>
-                                                    </div>
-                                                </div>
-                                            )
-                                        }
+    //                     {/* Showing the Right & Wrong Writing by HightLight  */}
+    //                     <div className="border-r-2 border-r-gray-300 border-l-2 border-l-gray-300 border-b-2 border-b-gray-300 sm:pl-3 sm:pr-3">
+    //                         {
+    //                             changeTap == "Correction" && (
+    //                                 <Compare
+    //                                     itemsSet={itemsSet}
+    //                                     imageText={imageText}
+    //                                     writingData={writingData.writinTextArea}
+    //                                     correctData={correctData}
+    //                                 />
+    //                             )
+    //                         }
+    //                         <div className="w-full h-full relative z-[100]">
+    //                             {
+    //                                 changeTap != "Correction" && (<>
+    //                                     {
+    //                                         storeTapContentForChangeUI == "LoginFirst" && (
+    //                                             < div className="absolute top-0 left-0 right-0  flex justify-center setBackgroundColorsInResultPremium align-middle w-full h-full z-[1000]">
+    //                                                 <div className="w-full h-[250px] bg-transparent translate-y-3 flex justify-center align-middle m-4 ">
+    //                                                     <button className="p-2 text-center m-auto text-white rounded-[10px] font-bold h-[40px] bg-blue-600 flex gap-2"
+    //                                                         onClick={() => {
+    //                                                             userLoginFunction();
+    //                                                             setchange_login_Status(false);
+    //                                                         }}
+    //                                                     >Need to Login <IoMdLogIn className="text-xl translate-y-[2px]" /></button>
+    //                                                 </div>
+    //                                             </div>
+    //                                         )
+    //                                     }
 
-                                        {
-                                            storeTapContentForChangeUI == "HaveToPay" && (
-                                                <div className="absolute top-0 left-0 right-0  flex justify-center setBackgroundColorsInResultPremium align-middle w-full h-full z-[1000]">
-                                                    <div className="w-full h-[250px] bg-transparent translate-y-3 flex justify-center align-middle m-4 ">
-                                                        <button className="p-2 text-center m-auto text-white rounded-[10px] font-bold h-[40px] bg-blue-600 flex gap-2"
-                                                            onClick={() => { history.push("/Payment-Pages/Billing-Page"); }}
-                                                        >Premium <FaChessQueen className="text-xl text-yellow-400" /></button>
-                                                    </div>
-                                                </div>
-                                            )
-                                        }
-                                    </>)
-                                }
+    //                                     {
+    //                                         storeTapContentForChangeUI == "HaveToPay" && (
+    //                                             <div className="absolute top-0 left-0 right-0  flex justify-center setBackgroundColorsInResultPremium align-middle w-full h-full z-[1000]">
+    //                                                 <div className="w-full h-[250px] bg-transparent translate-y-3 flex justify-center align-middle m-4 ">
+    //                                                     <button className="p-2 text-center m-auto text-white rounded-[10px] font-bold h-[40px] bg-blue-600 flex gap-2"
+    //                                                         onClick={() => { history.push("/Payment-Pages/Billing-Page"); }}
+    //                                                     >Premium <FaChessQueen className="text-xl text-yellow-400" /></button>
+    //                                                 </div>
+    //                                             </div>
+    //                                         )
+    //                                     }
+    //                                 </>)
+    //                             }
 
-                                {
-                                    changeTap == "Evaluation" && (
-                                        <ResultEvaluations
-                                            lexicalResWords={lexicalResWords}
-                                            grammerMistakes={grammerMistakes}
-                                            userTextToPassResultEvaluation={userTextToPassResultEvaluation}
+    //                             {
+    //                                 changeTap == "Evaluation" && (
+    //                                     <ResultEvaluations
+    //                                         lexicalResWords={lexicalResWords}
+    //                                         grammerMistakes={grammerMistakes}
+    //                                         userTextToPassResultEvaluation={userTextToPassResultEvaluation}
 
-                                            LexicalResourceScore={LexicalResourceScore}
-                                            GrammarScore={GrammarScore}
-                                            storeCoherenceScore={storeCoherenceScore}
-                                        />
-                                    )
-                                }
+    //                                         LexicalResourceScore={LexicalResourceScore}
+    //                                         GrammarScore={GrammarScore}
+    //                                         storeCoherenceScore={storeCoherenceScore}
+    //                                     />
+    //                                 )
+    //                             }
 
-                                {
-                                    changeTap == "Improvement" && (
-                                        <ResultImprovement
-                                            storeTapContentForChangeUI={storeTapContentForChangeUI}
-                                            SpeakingSummary={SpeakingSummary}
-                                            SpeakingImprovement={SpeakingImprovement}
+    //                             {
+    //                                 changeTap == "Improvement" && (
+    //                                     <ResultImprovement
+    //                                         storeTapContentForChangeUI={storeTapContentForChangeUI}
+    //                                         SpeakingSummary={SpeakingSummary}
+    //                                         SpeakingImprovement={SpeakingImprovement}
 
-                                        />
-                                    )
-                                }
-                            </div>
+    //                                     />
+    //                                 )
+    //                             }
+    //                         </div>
 
 
 
-                        </div>
-                    </div>
-                </section>
-            )}
-        </div>
-    )
+    //                     </div>
+    //                 </div>
+    //             </section>
+    //         )}
+    //     </div>
+    // )
 }
+
+const styles = StyleSheet.create({
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width,
+        height,
+        backgroundColor: 'white',
+        zIndex: 999,
+        // 👇 removes centering
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        paddingTop: 100, // Optional padding for close button space
+        transform: [{ translateY: -240 }]
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        zIndex: 1000,
+        padding: 10,
+    },
+    closeText: {
+        color: 'red',
+        fontWeight: 800,
+        fontSize: 17,
+    },
+    content: {
+        width: '90%',
+        height: '100vh',
+        backgroundColor: '#333',
+        borderRadius: 12,
+        transform: [{ translateY: -25 }]
+    },
+    text: {
+        color: 'white',
+        fontSize: 18,
+    },
+    //IELTS and TOFEL scoring animation stylings
+    container: {
+        flexDirection: 'row',
+        gap: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        transform: [{ translateY: -70 }]
+    },
+    circleWrapper: {
+        width: 80,
+        height: 100,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    centeredText: {
+        position: 'absolute',
+        top: 26,
+        alignSelf: 'center',
+    },
+    scoreLabel: {
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    scoreTitle: {
+        marginTop: 6,
+        fontSize: 11,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+
+    // width bars styling ...
+    wrapper: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 3,
+        justifyContent: 'space-between',
+        padding: 10,
+        transform: [{ translateY: -70 }]
+    },
+    barBlock: {
+        width: BAR_WIDTH,
+    },
+    barTextRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 3,
+    },
+    label: {
+        fontSize: 10,
+        fontWeight: '600',
+        color: '#111',
+    },
+    scoreText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#000',
+    },
+    progressBg: {
+        backgroundColor: 'rgb(192,192,192)',
+        height: 12,
+        borderRadius: 25,
+        overflow: 'hidden',
+    },
+    progressFill: {
+        backgroundColor: '#2563eb',
+        height: 12,
+        borderRadius: 25,
+    },
+    warningButton: {
+        width: '10%',
+        marginLeft: 'auto',
+        backgroundColor: '#fee2e2',
+        paddingVertical: 6,
+        transform: [
+            { translateX: -15 },
+            { translateY: -70 } // Change this value to whatever Y offset you need
+        ],
+        borderRadius: 6,
+    },
+    warningText: {
+        fontSize: 10,
+        color: '#b91c1c',
+        textAlign: 'center',
+        fontWeight: '600',
+    },
+
+
+});

@@ -45,7 +45,7 @@ export async function postToSaveDataInDatabase(
     });
 
     const data = await response.json();
-    console.log("Post response:", data);
+    console.log("Post response__when save to database:", data);
   } catch (error) {
     console.error("Error posting data:", error);
   }

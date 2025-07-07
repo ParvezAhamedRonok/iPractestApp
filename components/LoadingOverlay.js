@@ -10,15 +10,18 @@ const LoadingScreen = ({ time = 30 }) => {
   const rotateClock = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.loop(
-      Animated.timing(rotateClock, {
-        toValue: 1,
-        duration: 6000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, []);
+    if (LoadingGlobally) {
+      rotateClock.setValue(0);
+      Animated.loop(
+        Animated.timing(rotateClock, {
+          toValue: 1,
+          duration: 6000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      ).start();
+    }
+  }, [LoadingGlobally]);
 
   const createHandStyle = (length, color, thickness) => ({
     position: 'absolute',
@@ -26,11 +29,11 @@ const LoadingScreen = ({ time = 30 }) => {
     height: length,
     backgroundColor: color,
     borderRadius: 2,
-    top: 50 - length,
-    left: 50 - thickness / 2,
+    top: 30 - length,
+    left: 30 - thickness / 2,
   });
 
-  if (!LoadingGlobally) return null; // 🔥 Hide component if false
+  if (!LoadingGlobally) return null;
 
   return (
     <View style={styles.overlay}>
@@ -50,15 +53,20 @@ const LoadingScreen = ({ time = 30 }) => {
             },
           ]}
         >
-          <View style={createHandStyle(25, '#facc15', 4)} />
-          <View style={createHandStyle(35, '#a78bfa', 3)} />
-          <View style={createHandStyle(45, '#38bdf8', 2)} />
+          <View style={createHandStyle(15, '#facc15', 3)} />
+          <View style={createHandStyle(20, '#a78bfa', 2)} />
+          <View style={createHandStyle(25, '#38bdf8', 1)} />
           <View style={styles.centerDot} />
         </Animated.View>
 
-        <Timer Second={time} />
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ fontSize: 12, textAlign: 'center', color: '#333' }}>
+        <View style={styles.timerWrapper}>
+          <View style={styles.semiCircle}>
+            <Timer Second={time} />
+          </View>
+        </View>
+
+        <View style={styles.messageContainer}>
+          <Text style={styles.messageText}>
             {global_Msz_Showing && global_Msz_Showing}
           </Text>
         </View>
@@ -70,7 +78,8 @@ const LoadingScreen = ({ time = 30 }) => {
 const styles = StyleSheet.create({
   overlay: {
     width,
-    height,
+    // height,//
+      ...StyleSheet.absoluteFillObject, //using this instead of height
     backgroundColor: 'rgba(0,0,0,0.5)',
     position: 'absolute',
     top: 0,
@@ -80,40 +89,68 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   fixedBox: {
-    width: 150,
-    height: 180,
+    width: 120,
+    height: 150,
     backgroundColor: '#fff',
     borderRadius: 20,
-    padding: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    borderTopLeftRadius: 60,
+    borderTopRightRadius: 60,
     shadowColor: '#000',
     shadowOpacity: 0.25,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 10,
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 6,
   },
   clockFace: {
-    width: 90,
-    height: 90,
-    borderRadius: 50,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: 'white',
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: '#4b5563',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
   },
   centerDot: {
-    width: 12,
-    height: 12,
+    width: 8,
+    height: 8,
     backgroundColor: '#000',
-    borderRadius: 6,
+    borderRadius: 4,
     position: 'absolute',
-    top: 44,
-    left: 44,
+    top: 26,
+    left: 26,
+  },
+  timerWrapper: {
+    marginTop: 10,
+    width: 70,
+    height: 35,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  semiCircle: {
+    width: 70,
+    height: 35,
+    backgroundColor: '#f0f0f0',
+    borderTopLeftRadius: 70,
+    borderTopRightRadius: 70,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  messageContainer: {
+    marginTop: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  messageText: {
+    fontSize: 5,
+    textAlign: 'center',
+    color: '#333',
   },
 });
 

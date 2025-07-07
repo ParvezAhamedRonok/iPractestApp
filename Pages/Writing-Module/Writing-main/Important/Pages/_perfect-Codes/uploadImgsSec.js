@@ -31,6 +31,11 @@ export default function uploadImagesSection({
 
 
   useEffect(() => {
+    //make the imageArray initially empty when it will come first this component 
+    ImageArray = [];
+    setPreview([]);
+
+    console.log("iamges Urls_____===> " + ImageArray[0]);
     (async () => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
@@ -77,23 +82,25 @@ export default function uploadImagesSection({
   };
 
   const handleUpload = () => {
-    if (getUserWritinNo === '11' || getUserWritinNo === '111') {
+    if (Number(getUserWritinNo) >= 11) {
       //here i do not need to make any in page login setup 
       // because i just need to make a login setup i can redirect it to the dashboard;
-      setOpenClose_LogSign_Popup("Login")
-      alert("need login");
+      uploadImageGCP();
+     // alert("need login");
     } else {
+      //can remove the localstorage from here also..or we 
+      AsyncStorage.removeItem('WritingNo');
       uploadImageGCP();
     }
   };
 
   const uploadImageGCP = async () => {
     // alert("__ok");
-    // console.log("iamges Urls_____===> " + ImageArray[0]);
+
     // console.log(getUserWritinNo);
     setTimeout(async () => {
       if (!ImageArray.length) return Alert.alert("Upload Error", "No image selected!");
-      console.log(ImageArray)
+      // console.log("__Image files====="+ImageArray)
 
 
       setLoadingGlobally(true);
@@ -128,13 +135,14 @@ export default function uploadImagesSection({
 
             const data = JSON.parse(text);
             const cleanText = data.message
+             .replace(/^(Here('|’)?s\s+the\s+text\s+from\s+the\s+image:\s*)+/i, '')
               .replace(/['"]+/g, '')
               .replace(/\\n/g, ' ');
 
             combinedText += cleanText + ' ';
             // alert("__Success");
             // console.log("✅ Success:", cleanText);
-            console.log('1st_________' + combinedText);
+            // console.log('1st_________' + combinedText);
             setChangeImageUI(true);
 
 
@@ -146,7 +154,7 @@ export default function uploadImagesSection({
 
 
         }
-        console.log('Second______________' + combinedText);
+        // console.log('Second______________' + combinedText);
         setIgameText(combinedText.trim());
       } catch (err) {
         console.log(err);
