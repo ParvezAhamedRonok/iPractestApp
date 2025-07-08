@@ -47,6 +47,7 @@ export default function WritingTextArea({ task }) {
   const GetFullPathName = usePathname(); // ✅ Expo Router pathname
 
   const {
+    scrollRef, scrollY, setScrollY,
     LoadingGlobally,
     setLoadingGlobally,
     userPaymentStatusCheck,
@@ -284,8 +285,10 @@ export default function WritingTextArea({ task }) {
             taskScore,
             GetFullPathName
           );
-          
+
           setLoadingGlobally(false);
+          //calling scrolling function to take to to that scrolling position..
+          scrollingByFunc(0);
           alert("✅ Evaluation Done!");
         } catch (err) {
           console.error('💥 Main evaluation error:', err);
@@ -407,7 +410,24 @@ export default function WritingTextArea({ task }) {
     //ami ekhane user jokhon Result popup aa uoload question er jonno click korbe 
     // tokhon ektu blink kore dekhate pari je tumar etar maddhoe upload korte hobe question setar kar korte hobe ekhane ...
     setCorrectData('');
+    //calling scrolling function to take to to that scrolling position..
+    scrollingByFunc(200);
   };
+
+
+
+
+  //for scrolling to top by this function
+  const scrollingByFunc = (num) => {
+    const targetY = Math.max(scrollY - 200, 0);
+    scrollRef.current?.scrollTo({ y: num, animated: true });
+  };
+
+
+
+
+
+
 
   return (
     <>

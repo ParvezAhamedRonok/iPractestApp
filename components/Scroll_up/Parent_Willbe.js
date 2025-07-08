@@ -20,6 +20,12 @@ export default function ParentComponent() {
     scrollRef.current?.scrollTo({ y: targetY, animated: true });
   };
 
+  //i can use this if i want to make scrolling position 0 from 0 thats it 
+  // const scrollToTop = () => {
+  //   scrollRef.current?.scrollTo({ y: 0, animated: true });
+  // };
+
+
   return (
     <View style={styles.container}>
       <ScrollButton onScrollUp={scrollUpBy200} />

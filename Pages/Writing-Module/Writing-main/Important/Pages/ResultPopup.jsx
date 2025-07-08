@@ -63,6 +63,7 @@ export default function ResultPopup({ correctData,
     const animatedTOEFL = useState(new Animated.Value(CIRCLE_LENGTH))[0];
 
     useEffect(() => {
+        alert(changeTap)
         const ieltsTarget =
             CIRCLE_LENGTH - (CIRCLE_LENGTH * Number(postIeltsRate)) / 9; // Max IELTS = 9
 

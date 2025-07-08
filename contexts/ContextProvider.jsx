@@ -11,7 +11,10 @@ export const ContextProvider = ({ children }) => {
   const [ShowPaymentInfo, setShowPaymentInfo] = useState(false);
   const [ShowMentorInfo, setShowMentorInfo] = useState(false);
   const [ShowDeleteAccountInfo, setShowDeleteAccountInfo] = useState(false);
-
+  //for scroll to to or my wise scroll position set using -
+  // this states and full parent and child processing is in component
+  const scrollRef = useRef(null);
+  const [scrollY, setScrollY] = useState(0);
 
 
 
@@ -81,6 +84,7 @@ export const ContextProvider = ({ children }) => {
       ShowPaymentInfo, setShowPaymentInfo,
       ShowMentorInfo, setShowMentorInfo,
       ShowDeleteAccountInfo, setShowDeleteAccountInfo,
+      scrollRef,scrollY, setScrollY,
       //for Reading Modules...
       openPopup_ExR, setOpenPopup_ExR,
       explainObj_Reading, setExplainObj_Reading,

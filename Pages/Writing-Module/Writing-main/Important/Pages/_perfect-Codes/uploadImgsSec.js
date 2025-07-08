@@ -22,6 +22,7 @@ export default function uploadImagesSection({
   getUserWritinNo, setGetUserGritingNo, setIgameText, setitemsSet, setChangeImageUI,
 }) {
   const {
+    scrollRef, scrollY, setScrollY,
     userPaymentStatusCheck,
     LoadingGlobally,
     setLoadingGlobally,
@@ -85,8 +86,8 @@ export default function uploadImagesSection({
     if (Number(getUserWritinNo) >= 11) {
       //here i do not need to make any in page login setup 
       // because i just need to make a login setup i can redirect it to the dashboard;
-      uploadImageGCP();
-     // alert("need login");
+      setOpenClose_LogSign_Popup("Login")
+      // alert("need login");
     } else {
       //can remove the localstorage from here also..or we 
       AsyncStorage.removeItem('WritingNo');
@@ -135,7 +136,7 @@ export default function uploadImagesSection({
 
             const data = JSON.parse(text);
             const cleanText = data.message
-             .replace(/^(Here('|’)?s\s+the\s+text\s+from\s+the\s+image:\s*)+/i, '')
+              .replace(/^(Here('|’)?s\s+the\s+text\s+from\s+the\s+image:\s*)+/i, '')
               .replace(/['"]+/g, '')
               .replace(/\\n/g, ' ');
 
@@ -155,6 +156,7 @@ export default function uploadImagesSection({
 
         }
         // console.log('Second______________' + combinedText);
+        scrollingByFunc(150)
         setIgameText(combinedText.trim());
       } catch (err) {
         console.log(err);
@@ -164,6 +166,15 @@ export default function uploadImagesSection({
       }
     }, 1000);
   };
+
+
+
+  //for scrolling to top by this function
+  const scrollingByFunc = (num) => {
+    const targetY = Math.max(scrollY - 200, 0);
+    scrollRef.current?.scrollTo({ y: num, animated: true });
+  };
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

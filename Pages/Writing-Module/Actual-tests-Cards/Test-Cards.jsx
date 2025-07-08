@@ -22,11 +22,15 @@ import { useStateContext } from '../../../contexts/ContextProvider';
 
 export default function AllWritingTestServices() {
   const router = useRouter();
-  const { showVocabPopup, setShowVocabPopup } = useStateContext();
+  const { showVocabPopup, setShowVocabPopup, scrollRef, scrollY, setScrollY } = useStateContext();
   const [useremail, setUseremail] = useState('');
   const [userToken, setUserToken] = useState('');
   const [changeState, setChangeState] = useState('task1');
   const [testsData, setTestsData] = useState([]);
+  //for scrolling position check and set the position globally into states 
+  const handleScroll = (event) => {
+    setScrollY(event.nativeEvent.contentOffset.y);
+  };
 
   useEffect(() => {
     AsyncStorage.getItem('userEmail').then(setUseremail);
@@ -90,7 +94,12 @@ export default function AllWritingTestServices() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      ref={scrollRef}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      style={styles.container}
+    >
       <View style={styles.hero}>
         <View style={styles.heroLeft}>
           <View style={styles.heroBox}>
