@@ -112,7 +112,7 @@ export default function WritingTextArea({ task }) {
         AsyncStorage.getItem('GoogleFacebookToken'),
         AsyncStorage.getItem('userSignupInfo'),
         AsyncStorage.getItem('setCountry'),
-        AsyncStorage.getItem('loginTOken'),
+        AsyncStorage.getItem('loginToken'),
       ]);
       setUserLoginName(userName || '');
       setUserEmail(userEmail || '');
@@ -500,6 +500,7 @@ export default function WritingTextArea({ task }) {
           setIgameText={setIgameText}
           setitemsSet={setitemsSet}
           setChangeImageUI={setChangeImageUI}
+          userLoginToken={userLoginToken}
         />
 
 

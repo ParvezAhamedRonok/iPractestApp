@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Animated, ScrollView } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 const { width, height } = Dimensions.get('window');
+const isSmallScreen = width < 640;
 // import { MdOutlineCancel } from "react-icons/md";
 // import { IoMdLogIn } from "react-icons/io";
 // import { FaChessQueen } from "react-icons/fa";
@@ -89,6 +90,21 @@ export default function ResultPopup({ correctData,
     // alert(typeof MainTaskComplessionResult)
     const isError = MainTaskComplessionResult === 'error' || " ";
     const isZero = MainTaskComplessionResult === '0';
+
+
+
+    const renderContent = () => {
+        switch (changeTap) {
+            case "Correction":
+                return <Text style={styles.contentText}>✍️ This is the Correction content.</Text>;
+            case "Evaluation":
+                return <Text style={styles.contentText}>📊 This is the Evaluation content.</Text>;
+            case "Improvement":
+                return <Text style={styles.contentText}>📈 This is the Improvement content.</Text>;
+            default:
+                return null;
+        }
+    };
 
     return (
         <View style={styles.overlay}>
@@ -252,6 +268,48 @@ export default function ResultPopup({ correctData,
                     </TouchableOpacity>
                 )}
             </>
+            <View style={styles.screenWrapper}>
+                <View style={styles.tabWrapper}>
+                    <View style={styles.tabList}>
+                        {["Correction", "Evaluation", "Improvement"].map((item) => {
+                            const isActive = changeTap === item;
+                            return (
+                                <TouchableOpacity
+                                    key={item}
+                                    style={[
+                                        styles.tab,
+                                        isActive ? styles.activeTab : styles.inactiveTab,
+                                        {
+                                            paddingHorizontal: isSmallScreen ? 8 : 24,
+                                            paddingVertical: 8,
+                                        }
+                                    ]}
+                                    onPress={() => setChangeTap(item)}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.tabText,
+                                            isActive ? styles.activeText : styles.inactiveText,
+                                            { fontSize: isSmallScreen ? 8 : 14 }
+                                        ]}
+                                    >
+                                        {item === "Correction" ? "Writing Correction" :
+                                            item === "Evaluation" ? "Result Evaluation" :
+                                                "Area of Improvement"}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                </View>
+
+                {/* Background & content section */}
+                <ScrollView contentContainerStyle={styles.contentContainer}>
+                    <View style={styles.contentBox}>
+                        {renderContent()}
+                    </View>
+                </ScrollView>
+            </View>
         </View>
     );
 
@@ -269,26 +327,6 @@ export default function ResultPopup({ correctData,
     //                         </div>
     //                     </div>
 
-
-    //                     {/* all tabs */}
-    //                     <div className='bg-[##eaeaea] sm:mr-3 sm:ml-3 w-full border-b-[3px] border-b-[#20bbb7]' >
-    //                         <ul className='flex cursor-pointer gap-1 sm:gap-2 justify-center'>
-    //                             <li className={`${changeTap == "Correction" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2 px-2 sm:px-6 rounded-t-lg   text-[8px] sm:text-[14px] font-bold`}
-    //                                 onClick={() => { setChangeTap("Correction") }}
-    //                             >Writing Correction</li>
-    //                             <li className={`${changeTap == "Evaluation" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2  px-2 sm:px-6 rounded-t-lg  text-[8px] sm:text-[14px] font-bold`}
-    //                                 onClick={() => {
-    //                                     setChangeTap("Evaluation")
-    //                                 }}
-    //                             >Result Evaluation</li>
-    //                             <li className={`${changeTap == "Improvement" ? "bg-[#20bbb7] text-gray-50" : "bg-[#eeeef0] text-gray-500"} py-2  px-2 sm:px-6  rounded-t-lg text-[8px] sm:text-[14px] font-bold`}
-    //                                 onClick={() => {
-    //                                     setChangeTap("Improvement")
-    //                                 }}
-    //                             >Area of Improvement</li>
-
-    //                         </ul>
-    //                     </div>
 
     //                     {/* Showing the Right & Wrong Writing by HightLight  */}
     //                     <div className="border-r-2 border-r-gray-300 border-l-2 border-l-gray-300 border-b-2 border-b-gray-300 sm:pl-3 sm:pr-3">
@@ -493,6 +531,72 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: '600',
     },
+
+
+    //tappers..
+    screenWrapper: {
+        flex: 1,
+        backgroundColor: '#ffffff',
+        transform: [{ translateY: -70 }]
+    },
+    tabWrapper: {
+        width: '100%',
+        borderBottomWidth: 3,
+        borderBottomColor: '#20bbb7',
+        paddingHorizontal: 12,
+        // backgroundColor: '#f1f1f1',
+    },
+    tabList: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 8,
+
+    },
+    tab: {
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
+    },
+    activeTab: {
+        backgroundColor: '#20bbb7',
+    },
+    inactiveTab: {
+        backgroundColor: '#eeeef0',
+    },
+    tabText: {
+        fontWeight: 'bold',
+    },
+    activeText: {
+        color: '#f8f8f8',
+    },
+    inactiveText: {
+        color: '#6b7280',
+    },
+    contentContainer: {
+        padding: 0,
+        flexGrow: 1,
+        justifyContent: 'flex-start',
+    },
+    contentBox: {
+        backgroundColor: '#e8fdfc',
+        borderRadius: 12,
+        padding: 16,
+        minHeight: '90%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: '#20bbb7',
+        borderWidth: 2,
+    },
+    contentText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+    },
+
+
+
+
+
+
 
 
 });

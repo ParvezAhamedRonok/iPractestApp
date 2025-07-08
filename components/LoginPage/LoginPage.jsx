@@ -65,6 +65,7 @@ export default function LoginPage() {
 
       if (!response.ok) throw response;
       const res = await response.json();
+      alert(res.token)
 
       await AsyncStorage.setItem('loginToken', res.token);
       await AsyncStorage.setItem('userName', res.username);
@@ -82,8 +83,8 @@ export default function LoginPage() {
         else {
           //close login/signup popup..
           setOpenClose_LogSign_Popup("");
-          // nextPath("/User-Dashboard/Dashboard")
-          alert("ok")
+          nextPath("/User-Dashboard/Dashboard")
+          // alert("ok")
         }
 
       }, 1000);

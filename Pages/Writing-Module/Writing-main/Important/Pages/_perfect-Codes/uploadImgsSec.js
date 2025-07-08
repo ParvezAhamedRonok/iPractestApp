@@ -19,7 +19,7 @@ import { WRITING_POST_UPLOAD_GCP_IMAGE_TO_GET_TEXT_FROM_IMAGE } from "../../../.
 let ImageArray = [];
 
 export default function uploadImagesSection({
-  getUserWritinNo, setGetUserGritingNo, setIgameText, setitemsSet, setChangeImageUI,
+  getUserWritinNo, setGetUserGritingNo, setIgameText, setitemsSet, setChangeImageUI, userLoginToken
 }) {
   const {
     scrollRef, scrollY, setScrollY,
@@ -83,11 +83,11 @@ export default function uploadImagesSection({
   };
 
   const handleUpload = () => {
-    if (Number(getUserWritinNo) >= 11) {
+    if (!userLoginToken) {
       //here i do not need to make any in page login setup 
       // because i just need to make a login setup i can redirect it to the dashboard;
       setOpenClose_LogSign_Popup("Login")
-      // alert("need login");
+      alert("need login");
     } else {
       //can remove the localstorage from here also..or we 
       AsyncStorage.removeItem('WritingNo');
