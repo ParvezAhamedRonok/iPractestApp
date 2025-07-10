@@ -99,6 +99,7 @@ export default function AllWritingTestServices() {
       onScroll={handleScroll}
       scrollEventThrottle={16}
       style={styles.container}
+      nestedScrollEnabled={true}
     >
       <View style={styles.hero}>
         <View style={styles.heroLeft}>

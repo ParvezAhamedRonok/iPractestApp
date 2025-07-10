@@ -159,6 +159,7 @@ export default function WritingTextArea({ task }) {
   };
 
   const checkWritingAnswer = async (text) => {
+    console.log("added Question texts______________"+storeQuestionText)
     try {
 
       userTextToPassResultEvaluation = text;

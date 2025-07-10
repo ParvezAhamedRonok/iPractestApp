@@ -77,7 +77,7 @@ export default function QuestionUpload({ setStoreQuestionText }) {
 
   const uploadImageGCP = async () => {
     if (!ImageArray[0]) return;
-    console.log("___QuestionUpload"+ImageArray[0])
+    console.log("___QuestionUpload" + ImageArray[0])
 
     let imageTextCombined = '';
     for (const imageFile of ImageArray) {
@@ -87,7 +87,7 @@ export default function QuestionUpload({ setStoreQuestionText }) {
         type: imageFile.type,
         name: imageFile.name,
       });
-console.log(formData)
+      console.log(formData)
       try {
         const response = await fetch(WRITING_POST_UPLOAD_IMAGE_QUESTION_TO_TRANSFORM_INTO_TEXT, {
           method: 'POST',

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Animated, ScrollV
 import Svg, { Circle } from 'react-native-svg';
 const { width, height } = Dimensions.get('window');
 const isSmallScreen = width < 640;
+import Compare from './Compare';
 // import { MdOutlineCancel } from "react-icons/md";
 // import { IoMdLogIn } from "react-icons/io";
 // import { FaChessQueen } from "react-icons/fa";
@@ -65,6 +66,12 @@ export default function ResultPopup({ correctData,
 
     useEffect(() => {
         alert(changeTap)
+        console.log("📌 itemsSet:", itemsSet);
+        console.log("🖼️ imageText:", imageText);
+        console.log("📝 writingData:", writingData);
+        console.log("✅ correctData:", correctData);
+
+
         const ieltsTarget =
             CIRCLE_LENGTH - (CIRCLE_LENGTH * Number(postIeltsRate)) / 9; // Max IELTS = 9
 
@@ -82,7 +89,7 @@ export default function ResultPopup({ correctData,
             duration: 1500,
             useNativeDriver: true,
         }).start();
-    }, [postIeltsRate, TOELF_Score]);
+    }, [postIeltsRate, TOELF_Score, changeTap]);
     // width range bar ...
     const getWidth = (val, max = 10) =>
         `${(Number(val) / max) * 100}%`;
@@ -96,7 +103,12 @@ export default function ResultPopup({ correctData,
     const renderContent = () => {
         switch (changeTap) {
             case "Correction":
-                return <Text style={styles.contentText}>✍️ This is the Correction content.</Text>;
+                return <Compare
+                    itemsSet={itemsSet}
+                    imageText={imageText}
+                    writingData={writingData.writinTextArea}
+                    correctData={correctData}
+                />
             case "Evaluation":
                 return <Text style={styles.contentText}>📊 This is the Evaluation content.</Text>;
             case "Improvement":
@@ -269,6 +281,7 @@ export default function ResultPopup({ correctData,
                 )}
             </>
             <View style={styles.screenWrapper}>
+                {/* Tab List */}
                 <View style={styles.tabWrapper}>
                     <View style={styles.tabList}>
                         {["Correction", "Evaluation", "Improvement"].map((item) => {
@@ -293,9 +306,11 @@ export default function ResultPopup({ correctData,
                                             { fontSize: isSmallScreen ? 8 : 14 }
                                         ]}
                                     >
-                                        {item === "Correction" ? "Writing Correction" :
-                                            item === "Evaluation" ? "Result Evaluation" :
-                                                "Area of Improvement"}
+                                        {item === "Correction"
+                                            ? "Writing Correction"
+                                            : item === "Evaluation"
+                                                ? "Result Evaluation"
+                                                : "Area of Improvement"}
                                     </Text>
                                 </TouchableOpacity>
                             );
@@ -303,8 +318,8 @@ export default function ResultPopup({ correctData,
                     </View>
                 </View>
 
-                {/* Background & content section */}
-                <ScrollView contentContainerStyle={styles.contentContainer}>
+                {/* Scrollable Content */}
+                <ScrollView contentContainerStyle={styles.contentContainer} nestedScrollEnabled={true}>
                     <View style={styles.contentBox}>
                         {renderContent()}
                     </View>
@@ -544,6 +559,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 3,
         borderBottomColor: '#20bbb7',
         paddingHorizontal: 12,
+        justifyContent:'center',
+        margin:'auto'
         // backgroundColor: '#f1f1f1',
     },
     tabList: {
@@ -585,6 +602,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderColor: '#20bbb7',
         borderWidth: 2,
+        overflow: 'scroll'
     },
     contentText: {
         fontSize: 16,

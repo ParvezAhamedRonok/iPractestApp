@@ -1,5 +1,6 @@
-"use client"
+
 import React, { useEffect } from "react";
+import { Text, StyleSheet } from 'react-native';
 import * as diff from "diff";
 import PropTypes from "prop-types";
 
@@ -20,11 +21,7 @@ const styles = {
 const Diff = ({ string1 = "", string2 = "", mode = "characters" }) => {
   let groups = [];
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.diff = diff; // Assign diff to the window object on the client side
-    }
-  }, []);
+
 
   if (mode === "characters") groups = diff.diffChars(string1, string2);
   if (mode === "words") groups = diff.diffWords(string1, string2);
@@ -35,25 +32,25 @@ const Diff = ({ string1 = "", string2 = "", mode = "characters" }) => {
     if (added) nodeStyles = styles.added;
     if (removed) nodeStyles = styles.removed;
 
-    if (added) return <span
+    if (added) return <Text
       style={nodeStyles}
       className="mb-2"
       key={index}
-    >{value}</span>;
-    if (removed) return <span
+    >{value}</Text>;
+    if (removed) return <Text
       style={nodeStyles}
       className="mb-2"
       key={index}
-    >{added}</span>;
-    return <span
+    >{added}</Text>;
+    return <Text
       style={nodeStyles}
       className="mb-2"
       key={index}
-    >{value}</span>;
+    >{value}</Text>;
 
   });
 
-  return <span>{mappedNodes}</span>;
+  return <Text>{mappedNodes}</Text>;
 };
 
 Diff.propTypes = {
