@@ -166,7 +166,7 @@ export default function ResultEvaluations({
 
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true}>
             <ScoreBox
                 color="#541bac"
                 title="Coherence"
@@ -201,23 +201,28 @@ export default function ResultEvaluations({
                             <View
                                 key={index}
                                 style={[
-                                    styles.flexRow,
-                                    isIntro && { fontSize: 14, fontWeight: 'bold', marginBottom: 6 },
-                                    isSectionTitle && { fontSize: 16, fontWeight: 'bold', marginTop: 10, marginBottom: 6 },
+                                    styles.bulletRow,
+                                    isIntro && { marginBottom: 6 },
+                                    isSectionTitle && { marginTop: 10, marginBottom: 6 },
                                     isBullet && { marginBottom: 4 },
                                 ]}
                             >
                                 {/* Bullet Dot */}
                                 {isBullet && (
                                     <View style={styles.bulletWrapper}>
-                                        <View style={[styles.dot, items.trim() === '' && { backgroundColor: 'transparent', marginLeft: 4 }]} />
+                                        <View
+                                            style={[
+                                                styles.dot,
+                                                items.trim() === '' && { backgroundColor: 'transparent', marginLeft: 4 },
+                                            ]}
+                                        />
                                     </View>
                                 )}
 
                                 {/* Text */}
                                 <Text
                                     style={[
-                                        styles.detailItem,
+                                        styles.bulletText,
                                         isIntro && { fontWeight: 'bold', fontSize: 14 },
                                         isSectionTitle && { fontWeight: 'bold', fontSize: 16 },
                                     ]}
@@ -230,6 +235,7 @@ export default function ResultEvaluations({
                 ) : (
                     <Text>No lexical feedback found.</Text>
                 )}
+
             </ScoreBox>
 
             <ScoreBox
@@ -326,24 +332,32 @@ const styles = StyleSheet.create({
     },
 
     //some lexical extra styling..
-    flexRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        width: '100%',
-        gap: 8,
-    },
+   bulletRow: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  width: '100%',
+  paddingRight: 8, // avoid edge cut
+},
 
-    bulletWrapper: {
-        width: 25,
-        marginTop: 4,
-        alignItems: 'center',
-    },
+bulletWrapper: {
+  width: 25,
+  alignItems: 'center',
+  paddingTop: 4,
+},
 
-    dot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: '#444',
-    },
+dot: {
+  width: 8,
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: '#444',
+},
+
+bulletText: {
+  flex: 1, // THIS ensures text wraps
+  flexWrap: 'wrap',
+  fontSize: 14,
+  color: '#333',
+},
+
 
 });

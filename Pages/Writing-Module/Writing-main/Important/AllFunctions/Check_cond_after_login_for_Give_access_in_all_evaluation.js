@@ -33,8 +33,8 @@ export async function Check_cond_after_login_for_Give_access_in_all_evaluation(
   }
 
   setTimeout(async () => {
-    alert("log in-condions pass");
-    alert('Status'+userPaymentStatusCheck)
+    // alert("log in-condions pass");
+    alert('Mail-->'+useremail)
     try {
       const response = await fetch(`${WRITING_GET_SINGLE_USER_IPRACTEST_FEEDBACK_DATA}${useremail}`, {
         method: "GET",

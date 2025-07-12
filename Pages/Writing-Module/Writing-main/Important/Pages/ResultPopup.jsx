@@ -5,6 +5,7 @@ const { width, height } = Dimensions.get('window');
 const isSmallScreen = width < 640;
 import Compare from './Compare';
 import ResultEvaluations from "./ResultEvaluations";
+import ResultImprovement from './ResultImprovement';
 // import { MdOutlineCancel } from "react-icons/md";
 // import { IoMdLogIn } from "react-icons/io";
 // import { FaChessQueen } from "react-icons/fa";
@@ -127,7 +128,15 @@ export default function ResultPopup({ correctData,
                     />
                 )
             case "Improvement":
-                return <Text style={styles.contentText}>📈 This is the Improvement content.</Text>;
+                return <ResultImprovement
+                    storeTapContentForChangeUI={storeTapContentForChangeUI}
+                    setchange_login_Status={setchange_login_Status}
+                    userLoginFunction={userLoginFunction}
+                    //  Making condition with above props..
+                    SpeakingSummary={SpeakingSummary}
+                    SpeakingImprovement={SpeakingImprovement}
+
+                />
             default:
                 return null;
         }
