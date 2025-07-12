@@ -4,6 +4,7 @@ import Svg, { Circle } from 'react-native-svg';
 const { width, height } = Dimensions.get('window');
 const isSmallScreen = width < 640;
 import Compare from './Compare';
+import ResultEvaluations from "./ResultEvaluations";
 // import { MdOutlineCancel } from "react-icons/md";
 // import { IoMdLogIn } from "react-icons/io";
 // import { FaChessQueen } from "react-icons/fa";
@@ -110,7 +111,21 @@ export default function ResultPopup({ correctData,
                     correctData={correctData}
                 />
             case "Evaluation":
-                return <Text style={styles.contentText}>📊 This is the Evaluation content.</Text>;
+                return changeTap == "Evaluation" && (
+                    <ResultEvaluations
+                        storeTapContentForChangeUI={storeTapContentForChangeUI}
+                        setchange_login_Status={setchange_login_Status}
+                        userLoginFunction={userLoginFunction}
+                        //  Making condition with above props
+
+                        lexicalResWords={lexicalResWords}
+                        grammerMistakes={grammerMistakes}
+                        userTextToPassResultEvaluation={userTextToPassResultEvaluation}
+                        LexicalResourceScore={LexicalResourceScore}
+                        GrammarScore={GrammarScore}
+                        storeCoherenceScore={storeCoherenceScore}
+                    />
+                )
             case "Improvement":
                 return <Text style={styles.contentText}>📈 This is the Improvement content.</Text>;
             default:
@@ -364,8 +379,9 @@ export default function ResultPopup({ correctData,
     //                                                 <div className="w-full h-[250px] bg-transparent translate-y-3 flex justify-center align-middle m-4 ">
     //                                                     <button className="p-2 text-center m-auto text-white rounded-[10px] font-bold h-[40px] bg-blue-600 flex gap-2"
     //                                                         onClick={() => {
-    //                                                             userLoginFunction();
     //                                                             setchange_login_Status(false);
+    //                                                             userLoginFunction();
+    //                                                           
     //                                                         }}
     //                                                     >Need to Login <IoMdLogIn className="text-xl translate-y-[2px]" /></button>
     //                                                 </div>
@@ -559,8 +575,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 3,
         borderBottomColor: '#20bbb7',
         paddingHorizontal: 12,
-        justifyContent:'center',
-        margin:'auto'
+        justifyContent: 'center',
+        margin: 'auto'
         // backgroundColor: '#f1f1f1',
     },
     tabList: {

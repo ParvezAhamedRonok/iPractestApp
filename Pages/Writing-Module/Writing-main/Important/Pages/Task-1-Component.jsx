@@ -124,7 +124,7 @@ export default function WritingTextArea({ task }) {
     })();
     // setLoadingGlobally(true)
   }, []);
-
+// alert(useremail)
   const Reload_Page_func = () => {
     router.replace(`${pathname}?reload=${Date.now()}`);
   };
@@ -159,7 +159,7 @@ export default function WritingTextArea({ task }) {
   };
 
   const checkWritingAnswer = async (text) => {
-    console.log("added Question texts______________"+storeQuestionText)
+    console.log("added Question texts______________" + storeQuestionText)
     try {
 
       userTextToPassResultEvaluation = text;
@@ -199,7 +199,7 @@ export default function WritingTextArea({ task }) {
 
       setTimeout(async () => {
         try {
-          Alert.alert('Starting...');
+          // Alert.alert('Starting...');
           console.log(text);
 
           // First API call
@@ -274,6 +274,9 @@ export default function WritingTextArea({ task }) {
           setLexicalResourceScore(data.LexicalResourceScore);
           setGeammarScore(data.GrammaticalScore);
           setCoherenceScore(data.CoherenceScore);
+          // console.log("Parvez____________>>"+data.CoherenceScore)
+          // console.log("Parvez____________>>"+data.GrammaticalScore)
+          // console.log("Parvez____________>>"+data.LexicalResourceScore)
 
           Making_TOEFL_Scroes(rounded);
 

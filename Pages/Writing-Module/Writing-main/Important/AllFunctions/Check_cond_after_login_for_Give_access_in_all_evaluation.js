@@ -22,14 +22,19 @@ export async function Check_cond_after_login_for_Give_access_in_all_evaluation(
   // Get credentials from AsyncStorage
   const useremail = await AsyncStorage.getItem("userEmail");
   const userName = await AsyncStorage.getItem("userName");
-  const userLoginToken = await AsyncStorage.getItem("loginTOken");
+  const userLoginToken = await AsyncStorage.getItem("loginToken");
 
-  if (!useremail || !userLoginToken) {
+  // alert(useremail);
+  // alert(userLoginToken)
+  if (!userLoginToken) {
     setstoreTapContentForChangeUI("LoginFirst");
+    alert("need to log in")
     return;
   }
 
   setTimeout(async () => {
+    alert("log in-condions pass");
+    alert('Status'+userPaymentStatusCheck)
     try {
       const response = await fetch(`${WRITING_GET_SINGLE_USER_IPRACTEST_FEEDBACK_DATA}${useremail}`, {
         method: "GET",

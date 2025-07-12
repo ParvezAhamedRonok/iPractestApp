@@ -22,10 +22,11 @@ export default function RootLayout() {
   const colorScheme = useColorScheme(); // Custom hook (your code)
   const nativeColorScheme = useNativeColorScheme(); // For fallback
   const currentScheme = colorScheme || nativeColorScheme || 'light';
-
+  // CheckPaymentStatus()
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
 
   useEffect(() => {
     if (loaded) {
@@ -53,7 +54,7 @@ export default function RootLayout() {
         <DeleteAccountPopup />
         <ShowPaymentInfo />
         <VocabularyPopup />
-        
+
 
         <StatusBar style={isDark ? 'transparent' : 'dark'} />
       </ContextProvider>

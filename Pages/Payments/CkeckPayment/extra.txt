@@ -7,7 +7,7 @@ import { AAMARPAY_GET_USER_DATA_FROM_DATABASE, PAYPAL_GET_USER_DATA_FROM_DATABAS
 // END OF THE IMPORTING.....
 
 export const CheckPaymentStatus = () => {
-    const { userPaymentStatusCheck, setuserPaymentStatusCheck } = useStateContext();
+    const { userPaymentStatusCheck, setUserPaymentStatusCheck } = useStateContext();
     const [userEmail, setuserEmail] = useState('');
 
     useEffect(() => {
@@ -81,10 +81,10 @@ export const CheckPaymentStatus = () => {
                 });
         };
 
-        fetchPaymentStatus(SSL_COMMERZ_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
-        fetchPaymentStatus(AAMARPAY_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
-        fetchPaymentStatus(PAYPAL_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
-    }, [userEmail, setuserPaymentStatusCheck]);
+        fetchPaymentStatus(SSL_COMMERZ_GET_USER_DATA_FROM_DATABASE, setUserPaymentStatusCheck);
+        fetchPaymentStatus(AAMARPAY_GET_USER_DATA_FROM_DATABASE, setUserPaymentStatusCheck);
+        fetchPaymentStatus(PAYPAL_GET_USER_DATA_FROM_DATABASE, setUserPaymentStatusCheck);
+    }, [userEmail, setUserPaymentStatusCheck]);
 
     return null;
 };

@@ -33,7 +33,7 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 
 const DashNavbar = () => {
   const history = useRouter();
-  const { currentColor, activeMenu, setActiveMenu, handleClick, isClicked, setScreenSize, screenSize, array, setArray, userPaymentStatusCheck, setuserPaymentStatusCheck } = useStateContext();
+  const { currentColor, activeMenu, setActiveMenu, handleClick, isClicked, setScreenSize, screenSize, array, setArray, userPaymentStatusCheck, setUserPaymentStatusCheck } = useStateContext();
   const [userCountryNmae, setUserCountryName] = useState();
   const [countryFlag, setcountryFlag] = useState("");
   const [LocallyUserProfileImg, setLocallyUserProfileImg] = useState("");

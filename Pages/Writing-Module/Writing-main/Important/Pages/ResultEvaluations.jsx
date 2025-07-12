@@ -1,409 +1,349 @@
-"use client";
+
 import React, { useEffect, useState } from 'react';
-import { IoMdArrowDropdown } from "react-icons/io";
-import { IoMdArrowDropup } from "react-icons/io";
 import {
-    CircularProgressbar,
-    CircularProgressbarWithChildren,
-    buildStyles
-} from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+    View, Text, TouchableOpacity, ScrollView, StyleSheet,
+} from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
+import Animated, {
+    useSharedValue,
+    useAnimatedProps,
+    withTiming,
+} from 'react-native-reanimated';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// Animation
-import { easeQuadInOut } from "d3-ease";
-import AnimatedProgressProvider from "@/components/Speaking-Module/Speaking-main/Pages/SpeakingResult/AnimatedProgressProvider.js";
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-//end of importing.........
+const STROKE_WIDTH = 8;
+const RADIUS = 30;
+const CIRCLE_LENGTH = 2 * Math.PI * RADIUS;
 
-
-
-export default function ResultEvaluations({ userTextToPassResultEvaluation, lexicalResWords, grammerMistakes, LexicalResourceScore, GrammarScore, storeCoherenceScore }) {
+export default function ResultEvaluations({
+    storeTapContentForChangeUI,
+    setchange_login_Status,
+    userLoginFunction,
+    //for making the condition for need to login and premium button by above props
+    userTextToPassResultEvaluation,
+    lexicalResWords,
+    grammerMistakes,
+    LexicalResourceScore,
+    GrammarScore,
+    storeCoherenceScore
+}) {
     const [storeSubordinateWords, setStoringsubordinateWords] = useState([]);
     const [storeLinkingWords, setStoringLinkingWords] = useState([]);
 
+    const [expanded, setExpanded] = useState({
+        coherence: false,
+        lexical: false,
+        grammar: false,
+    });
 
-    const [show1content, setShow1Content] = useState(false)
-    const [show2content, setShow2Content] = useState(false)
-    const [show3content, setShow3Content] = useState(false)
-    const [show4content, setShow4Content] = useState(false);
+    const animatedCoherence = useSharedValue(CIRCLE_LENGTH);
+    const animatedLexical = useSharedValue(CIRCLE_LENGTH);
+    const animatedGrammar = useSharedValue(CIRCLE_LENGTH);
 
-    console.log(grammerMistakes);
-    console.log(lexicalResWords);
+    const scoreToOffset = (score) => CIRCLE_LENGTH - (CIRCLE_LENGTH * (score / 10));
 
-    // Subordinate Conjuctions Array--------
-    let SubordianteConjuctionsArr = [
+    const SubordianteConjuctionsArr = [
         'after', 'although', 'as', 'as if', 'as long as', 'as much as', 'as soon as', 'as though', 'because', 'before', 'by the time', 'even if', 'even though', 'if', 'in case', 'in order that', 'in the event that', 'lest', 'now that', 'once', 'only', 'only if', 'provided that', 'since', 'so', 'supposing', 'than', 'that', 'though', 'till', 'unless', 'until', 'when', 'whenever', 'where', 'whereas', 'wherever', 'whether or not', 'while',
         'should', 'teenagers', 'have', 'what', 'is', 'the', 'greatest', 'challenge', 'facing', 'teachers', 'today'
-    ]
+    ];
 
-    //Linking Words Array------------
-    let LinkingWords = [
+    const LinkingWords = [
         'although', 'apart from', 'but for', 'despite', 'even though', 'as', 'because', 'in so far as', 'since', 'as long as', 'if', 'provided that', 'unless', 'whether', 'in order to', 'so as to', 'so that', 'to', 'also', 'beside', 'in addition', 'moreover', 'as far as i am concern', 'in my opinion', 'to my mind', 'as a consequence', 'as a result', 'eventuallu', 'so', "that's why", 'either ..or', 'neither ..nor', 'or', 'whatever', 'whoever', 'but', 'however', 'on the one hand', 'on the other hand', 'whereas', 'while'
     ]
 
-
-    useEffect(() => {
-        SubordinateLinkingWords();
-    }, [])
-
-
-
-
-    //make Subordinate words && linking words by the code below with the help of those linking & subordinates word array combine with the user speech array----------  
     const SubordinateLinkingWords = () => {
         if (userTextToPassResultEvaluation) {
-            let words = userTextToPassResultEvaluation.toLowerCase();
-            // let wordArray = words.split(' ');
-            let result = [];
-            SubordianteConjuctionsArr.map((items) => {
-                if (words.includes(items.toLowerCase())) {
-                    result.push(items)
-                }
-            })
-
-            // console.log(result);
-
-            let linkingResult = [];
-            LinkingWords.map((items) => {
-                if (words.includes(items.toLowerCase())) {
-                    linkingResult.push(items)
-                }
-            })
-
-            // console.log(linkingResult);
-            setStoringsubordinateWords(result);
-            setStoringLinkingWords(linkingResult);
-
-
+            const lowerText = userTextToPassResultEvaluation.toLowerCase();
+            const foundSubordinates = SubordianteConjuctionsArr.filter(word => lowerText.includes(word));
+            const foundLinkings = LinkingWords.filter(word => lowerText.includes(word));
+            setStoringsubordinateWords(foundSubordinates);
+            setStoringLinkingWords(foundLinkings);
         }
+    };
+
+    useEffect(() => {
+        console.log('Lexical Array data ------//>>>' + lexicalResWords)
+        SubordinateLinkingWords();
+        animatedCoherence.value = withTiming(scoreToOffset(storeCoherenceScore), { duration: 1000 });
+        animatedLexical.value = withTiming(scoreToOffset(LexicalResourceScore), { duration: 1000 });
+        animatedGrammar.value = withTiming(scoreToOffset(GrammarScore), { duration: 1000 });
+    }, []);
 
 
 
-    }
+
+    const renderCircle = (animatedValue, color, score) => {
+        const animatedProps = useAnimatedProps(() => ({
+            strokeDashoffset: animatedValue.value,
+        }));
+
+        return (
+            <View style={styles.progressWrapper}>
+                <Svg width={80} height={80}>
+                    <Circle
+                        cx={40}
+                        cy={40}
+                        r={RADIUS}
+                        stroke="#e6e6e6"
+                        strokeWidth={STROKE_WIDTH}
+                        fill="none"
+                    />
+                    <AnimatedCircle
+                        cx={40}
+                        cy={40}
+                        r={RADIUS}
+                        stroke={color}
+                        strokeWidth={STROKE_WIDTH}
+                        strokeDasharray={CIRCLE_LENGTH}
+                        animatedProps={animatedProps}
+                        strokeLinecap="round"
+                        fill="none"
+                    />
+                </Svg>
+                <Text style={styles.scoreText}>{score.toFixed(1)}</Text>
+            </View>
+        );
+    };
+
+    const toggleSection = (section) => {
+        setExpanded((prev) => ({
+            ...{ coherence: false, lexical: false, grammar: false },
+            [section]: !prev[section],
+        }));
+    };
+
+    const ScoreBox = ({ color, title, animatedValue, score, children, sectionKey }) => (
+        <View style={[styles.box, { backgroundColor: color }]}>
+            <View style={styles.header}>
+                <View style={styles.left}>
+                    {renderCircle(animatedValue, 'white', score)}
+                    <Text style={styles.boxTitle}>{title}</Text>
+                </View>
+                <TouchableOpacity onPress={() => toggleSection(sectionKey)}>
+                    <Ionicons
+                        name={expanded[sectionKey] ? 'chevron-up' : 'chevron-down'}
+                        size={24}
+                        color="#fff"
+                    />
+                </TouchableOpacity>
+            </View>
+            {expanded[sectionKey] && (
+                <View style={styles.detailBox}>
+                    {children}
+                </View>
+            )}
+        </View>
+    );
 
 
 
+    const parseGrammarData = (rawText) => {
+        const sections = {};
+        let currentSection = 'General';
+
+        const lines = rawText?.join(',').split(',') || [];
+
+        lines.forEach((line) => {
+            const trimmed = line.trim();
+
+            if (trimmed.match(/:$/) && trimmed.length < 100) {
+                currentSection = trimmed.replace(/:$/, '');
+                if (!sections[currentSection]) {
+                    sections[currentSection] = [];
+                }
+            } else {
+                if (!sections[currentSection]) {
+                    sections[currentSection] = [];
+                }
+                if (trimmed.length > 0) sections[currentSection].push(trimmed);
+            }
+        });
+
+        return sections;
+    };
 
 
     return (
-        <div className='grid justify-center align-middle p-2 sm:p-5'>
-            <div className="grid w-full sm:w-[670px] justify-center align-middle p-3 bg-white shadow-lg rounded">
-                <div className='flex w-full gap-2 flex-wrap justify-center p-2'>
-                    <div className={`bg-[#541bac] w-full sm:w-[300px] grid rounded-[20px] ${show1content ? "h-auto" : "h-[100px]"}`}>
-                        <div className='w-full'>
-                            <div className='flex justify-between w-full align-middle pl-[10px] pt-[17px] pr-[10px]'>
-                                <div className='p-1 flex justify-center align-middle gap-1'>
-                                    <div className='p-1 rounded-[50%] bg-white w-[60px] h-[60px]'>
+        <ScrollView contentContainerStyle={styles.container}>
+            <ScoreBox
+                color="#541bac"
+                title="Coherence"
+                animatedValue={animatedCoherence}
+                score={storeCoherenceScore}
+                sectionKey="coherence"
+            >
+                <Text style={styles.detailTitle}>Subordinate Words</Text>
+                {storeSubordinateWords.map((item, idx) => (
+                    <Text key={idx} style={styles.detailItem}>• {item}</Text>
+                ))}
+                <Text style={styles.detailTitle}>Linking Words</Text>
+                {storeLinkingWords.map((item, idx) => (
+                    <Text key={idx} style={styles.detailItem}>• {item}</Text>
+                ))}
+            </ScoreBox>
 
-                                        <AnimatedProgressProvider
-                                            valueStart={0}
-                                            valueEnd={Number(storeCoherenceScore
-                                            ) / 10 * 100}
-                                            duration={1.5}
-                                            easingFunction={easeQuadInOut}
-                                        // repeat
-                                        >
-                                            {value => {
-                                                let roundedValue = Math.round(value);
-                                                let mainNumber = String(roundedValue).split("").join(".");
-                                                // console.log(mainNumber)
-                                                return (
-                                                    <CircularProgressbar
-                                                        value={value}
-                                                        text={`${mainNumber}`}
-                                                        strokeWidth={12}
+            <ScoreBox
+                color="#f59e0b"
+                title="Lexical Resource"
+                animatedValue={animatedLexical}
+                score={LexicalResourceScore}
+                sectionKey="lexical"
+            >
+                {lexicalResWords?.length > 0 ? (
+                    lexicalResWords.map((items, index) => {
+                        const isIntro = index === 0;
+                        const isSectionTitle = items.match(/:$/gi) && !isIntro;
+                        const isBullet = !isIntro && !isSectionTitle;
 
-                                                        styles={buildStyles({
-                                                            pathTransition: "none",
-                                                            //  textColor: "red",
-                                                            pathColor: "green",
+                        return (
+                            <View
+                                key={index}
+                                style={[
+                                    styles.flexRow,
+                                    isIntro && { fontSize: 14, fontWeight: 'bold', marginBottom: 6 },
+                                    isSectionTitle && { fontSize: 16, fontWeight: 'bold', marginTop: 10, marginBottom: 6 },
+                                    isBullet && { marginBottom: 4 },
+                                ]}
+                            >
+                                {/* Bullet Dot */}
+                                {isBullet && (
+                                    <View style={styles.bulletWrapper}>
+                                        <View style={[styles.dot, items.trim() === '' && { backgroundColor: 'transparent', marginLeft: 4 }]} />
+                                    </View>
+                                )}
 
-                                                            // trailColor: "gold"
-                                                        })}
-                                                    />
-                                                );
-                                            }}
-                                        </AnimatedProgressProvider>
-                                    </div>
-                                    <p className='font-bold text-center m-auto text-[14px] text-white'>
-                                        Coherence
-                                    </p>
+                                {/* Text */}
+                                <Text
+                                    style={[
+                                        styles.detailItem,
+                                        isIntro && { fontWeight: 'bold', fontSize: 14 },
+                                        isSectionTitle && { fontWeight: 'bold', fontSize: 16 },
+                                    ]}
+                                >
+                                    {items}
+                                </Text>
+                            </View>
+                        );
+                    })
+                ) : (
+                    <Text>No lexical feedback found.</Text>
+                )}
+            </ScoreBox>
 
-                                </div>
-                                <div className=' flex justify-center align-middle'>
-                                    <div className='rounded-[50%] m-auto bg-gray-50 w-[20px] h-[20px] '><span className="text-gray-950  font-bold cursor-pointer"
-                                        onClick={() => {
-                                            setShow1Content(!show1content)
-                                            setShow2Content(false)
-                                        }}
-                                    >
-                                        {
-                                            show1content ? <IoMdArrowDropup className='text-2xl translate-y-[-2px] translate-x-[-2px]' /> : <IoMdArrowDropdown className='text-2xl translate-x-[-2px]' />
-                                        }
-                                    </span></div>
-                                </div>
-
-                            </div>
-                        </div>
-                        {
-                            show1content && (<div className={`w-full flex justify-center align-middle bg-white text-black border-r-2 border-l-2 border-b-2 border-gray-300 p-2`}>
-                                <div className='w-full bg-transparent text-start  text-black '>
-                                    <span className='text-xl font-bold'>Subordinate Words</span>
-                                    <div className='flex flex-wrap gap-2  w-full justify-start leading-3'>
-                                        {
-                                            storeSubordinateWords.map((items, index) => {
-                                                return (<p className='text-[15px] text-black'
-                                                    key={index}
-                                                >
-                                                    <span className='w-[7px] h-[7px] mr-1 rounded-[50%] bg-black'></span>
-                                                    {items}</p>)
-                                            })
-                                        }
-                                    </div>
-                                    <span className='text-xl text-start font-bold mt-1'>Linking Words</span>
-                                    <div className='flex flex-wrap gap-3 w-full justify-start pt-2'>
-                                        {
-                                            storeLinkingWords.map((items, index) => {
-                                                return (<p className='text-[15px] text-black'
-                                                    key={index}
-                                                >
-                                                    <span className='w-[7px] h-[7px] mr-1 rounded-[50%] bg-black'></span>
-                                                    {items}</p>)
-                                            })
-                                        }
-                                    </div>
-                                </div>
-
-                            </div>
-                            )
-                        }
-                    </div>
-                    <div className={`bg-orange-400 w-full sm:w-[300px] grid rounded-[20px] ${show2content ? "h-auto" : "h-[100px]"}`}>
-                        <div className='w-full'>
-                            <div className='flex justify-between w-full align-middle pl-[10px] pt-[17px] pr-[10px]'>
-                                <div className='p-1 flex justify-center align-middle gap-1'>
-                                    <div className='p-1 rounded-[50%] bg-white w-[60px] h-[60px]'>
-                                        <AnimatedProgressProvider
-                                            valueStart={0}
-                                            valueEnd={Number(LexicalResourceScore) / 10 * 100}
-                                            duration={1.5}
-                                            easingFunction={easeQuadInOut}
-                                        // repeat
-                                        >
-                                            {value => {
-                                                let roundedValue = Math.round(value);
-                                                let mainNumber = String(roundedValue).split("").join(".");
-                                                // console.log(mainNumber)
-                                                return (
-                                                    <CircularProgressbar
-                                                        value={value}
-                                                        text={`${mainNumber}`}
-                                                        strokeWidth={12}
-
-                                                        styles={buildStyles({
-                                                            pathTransition: "none",
-                                                            //  textColor: "red",
-                                                            pathColor: "gold",
-
-                                                            // trailColor: "gold"
-                                                        })}
-                                                    />
-                                                );
-                                            }}
-                                        </AnimatedProgressProvider>
-                                    </div>
-                                    <p className='font-bold text-center m-auto text-[14px] text-white'>
-                                        Lexical Resource
-                                    </p>
-
-                                </div>
-                                <div className=' flex justify-center align-middle'>
-                                    <div className='rounded-[50%] m-auto bg-gray-50 w-[20px] h-[20px] '><span className="text-gray-950  font-bold cursor-pointer"
-                                        onClick={() => {
-                                            setShow2Content(!show2content);
-                                            setShow1Content(false)
-                                        }}
-                                    >
-                                        {
-                                            show2content ? <IoMdArrowDropup className='text-2xl translate-y-[-2px] translate-x-[-2px]' /> : <IoMdArrowDropdown className='text-2xl translate-x-[-2px]' />
-                                        }
-                                    </span></div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        {
-                            show2content && (
-                                <div className={`w-full flex justify-center align-middle bg-white text-black border-r-2 border-l-2 border-b-2 border-gray-300 p-2`}>
-
-                                    <div className='w-full bg-transparent text-black p-2'>
-
-                                        <div className={`text-black w-full grid ${lexicalResWords[0] ? "justify-start" : "justify-center"}`}>
-                                            {lexicalResWords[0] ? (
-                                                lexicalResWords.map((items, index) => {
-                                                    return (<div key={index} className={`flex w-full justify-start gap-3
-                                                                    ${index == 0 && "text-[14px] font-bold mb-2"}
-                                                                     ${items.match(/:/gi) && index != 0 && "text-[20px] font-bold mt-1"}
-                                                                      text-[14px] `}>
-                                                        {
-                                                            !items.match(/:/gi) && (
-                                                                <div className='w-[25px] translate-y-[4px]'>
-                                                                    <div className={`rounded-[50%] bg-gray-700 w-[10px] h-[10px] ${items == "  " && "bg-transparent ml-1 "}`}>
-                                                                    </div>
-                                                                </div>
-                                                            )
-                                                        }
-                                                        {
-                                                            items
-                                                        }
-                                                    </div>)
-                                                })
-                                            ) : (
-                                                // loader into lexical words if untill it's not come
-                                                <div className='flex w-full h-full justify-center align-middle p-10'>
-                                                    <div
-                                                        className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white m-auto"
-                                                        role="status">
-                                                        <span
-                                                            className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-                                                        >Loading...</span
-                                                        >
-                                                    </div>
-                                                </div>
-                                            )
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        }
-                    </div>
-                </div>
-
-
-                <div className='flex w-full gap-2 flex-wrap justify-center p-2'>
-                    <div className={`bg-[#3ed9ae] w-full sm:w-[300px] grid rounded-[20px] ${show3content ? "h-auto" : "h-[100px]"}`}>
-                        <div className='w-full'>
-                            <div className='flex justify-between w-full align-middle pl-[10px] pt-[17px] pr-[10px]'>
-                                <div className='p-1 flex justify-center align-middle gap-1'>
-                                    <div className='p-1 rounded-[50%] bg-white w-[60px] h-[60px]'>
-
-                                        <AnimatedProgressProvider
-                                            valueStart={0}
-                                            valueEnd={Number(GrammarScore) / 10 * 100}
-                                            duration={1.5}
-                                            easingFunction={easeQuadInOut}
-                                        // repeat
-                                        >
-                                            {value => {
-                                                let roundedValue = Math.round(value);
-                                                let mainNumber = String(roundedValue).split("").join(".");
-                                                // console.log(mainNumber)
-                                                return (
-                                                    <CircularProgressbar
-                                                        value={value}
-                                                        text={`${mainNumber}`}
-                                                        strokeWidth={12}
-
-                                                        styles={buildStyles({
-                                                            pathTransition: "none",
-                                                            //  textColor: "red",
-                                                            pathColor: "green",
-                                                            // trailColor: "gold"
-                                                        })}
-                                                    />
-                                                );
-                                            }}
-                                        </AnimatedProgressProvider>
-                                    </div>
-                                    <p className='font-bold text-center m-auto text-[12px] text-white'>
-                                        Grammatical Accuracy
-                                    </p>
-
-                                </div>
-                                <div className=' flex justify-center align-middle'>
-                                    <div className='rounded-[50%] m-auto bg-gray-50 w-[20px] h-[20px] '><span className="text-gray-950  font-bold cursor-pointer"
-                                        onClick={() => {
-                                            setShow3Content(!show3content);
-                                            setShow4Content(false)
-
-                                        }}
-                                    >
-                                        {
-                                            show3content ? <IoMdArrowDropup className='text-2xl translate-y-[-2px] translate-x-[-2px]' /> : <IoMdArrowDropdown className='text-2xl translate-x-[-2px]' />
-                                        }
-                                    </span></div>
-                                </div>
-
-                            </div>
-                        </div>
-                        {
-                            show3content && (
-                                <div className={`w-full flex justify-center align-middle bg-white text-black border-r-2 border-l-2 border-b-2 border-gray-300 p-2`}>
-
-                                    <div className='w-full bg-transparent  text-black p-2'>
-
-                                        <div className={`text-black w-full grid ${grammerMistakes[0] ? "justify-start" : "justify-center"}`}>
-                                            {grammerMistakes[0] ? (
-                                                grammerMistakes.map((items, index) => {
-                                                    return (<div key={index} className={`flex w-full gap-3
-                                                                  ${index == 0 && "text-[12px] font-bold mb-2"} 
-                                                                  ${index != 0 && items.match(/\d/g) && "text-[17px] font-bold mt-2"} 
-                                                                  ${items.slice(0, 13).match(/Overall/gi) && "text-[18px] font-bold mt-2"} 
-
-                                                                  ${items.slice(0, 12).match(/Problem/gi) && "text-[14px] font-bold mt-2 text-red-400"}
-                                                                  ${items.slice(0, 12).match(/Solution/gi) && "text-[14px] font-bold mt-2 text-green-400"}
-                                                                  ${items.slice(0, 12).match(/Issue/gi) && "text-[14px] font-bold mt-2 text-red-400"}
-                                                                  ${items.slice(0, 12).match(/correct/gi) && "text-[14px] font-bold mt-2 text-green-400"}
-                                                                  ${items.slice(0, 12).match(/Possible/gi) && "text-[14px] font-bold mt-2 text-green-400"}
-                                                                  
-                                                                  `}
-
-                                                    >
-                                                        {
-                                                            items != " " && !items.match(/\d/g) && (
-                                                                <div className={`*:
-                                                                                ${index == 0 && "hidden"}
-                                                                                ${items.match(/:/gi) && "hidden"}
-                                                                                `}>
-                                                                    <div className={`rounded-[50%] bg-gray-700 translate-y-[4px] w-[10px] h-[10px] ${items == "  " && "bg-transparent ml-2 "}
-                                                                                    `}>
-
-                                                                    </div>
-                                                                </div>
-                                                            )
-                                                        }
-                                                        {
-                                                            items
-                                                        }
-                                                    </div>)
-                                                })
-                                            ) : (
-                                                <div className='flex w-full h-full justify-center align-middle p-10'>
-                                                    <div
-                                                        className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white m-auto"
-                                                        role="status">
-                                                        <span
-                                                            className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-                                                        >Loading...</span
-                                                        >
-                                                    </div>
-                                                </div>
-                                            )
-                                            }
-                                        </div>
-                                    </div>
-
-                                </div>
-                            )
-                        }
-
-                    </div>
-
-
-                </div>
-            </div>
-        </div>
-    )
+            <ScoreBox
+                color="#3ed9ae"
+                title="Grammatical Accuracy"
+                animatedValue={animatedGrammar}
+                score={GrammarScore}
+                sectionKey="grammar"
+            >
+                {grammerMistakes?.length > 0 ? (
+                    Object.entries(parseGrammarData(grammerMistakes)).map(([sectionTitle, items], idx) => (
+                        <View key={idx} style={{ marginBottom: 12 }}>
+                            <Text style={{ fontWeight: 'bold', fontSize: 15, marginBottom: 4, color: '#444' }}>
+                                📌 {sectionTitle}
+                            </Text>
+                            {items.map((item, i) => (
+                                <Text
+                                    key={i}
+                                    style={[
+                                        styles.detailItem,
+                                        /problem|issue|error|missing|incomplete/i.test(item) && { color: '#d32f2f', fontWeight: '500' },
+                                        /correct|should be|solution|fix|clarify|suggest/i.test(item) && { color: '#2e7d32', fontStyle: 'italic' },
+                                    ]}
+                                >
+                                    • {item}
+                                </Text>
+                            ))}
+                        </View>
+                    ))
+                ) : (
+                    <Text>No grammar issues found.</Text>
+                )}
+            </ScoreBox>
+        </ScrollView>
+    );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        padding: 16,
+        alignItems: 'center',
+    },
+    box: {
+        width: '100%',
+        borderRadius: 20,
+        marginVertical: 10,
+        padding: 12,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    left: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    boxTitle: {
+        color: 'white',
+        fontWeight: 'bold',
+        marginLeft: 12,
+        fontSize: 14,
+    },
+    detailBox: {
+        marginTop: 12,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 10,
+    },
+    detailTitle: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginTop: 8,
+        marginBottom: 4,
+        color: '#333',
+    },
+    detailItem: {
+        fontSize: 14,
+        marginVertical: 2,
+        color: '#333',
+    },
+    progressWrapper: {
+        position: 'relative',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: 80,
+    },
+    scoreText: {
+        position: 'absolute',
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#000',
+    },
+
+    //some lexical extra styling..
+    flexRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        width: '100%',
+        gap: 8,
+    },
+
+    bulletWrapper: {
+        width: 25,
+        marginTop: 4,
+        alignItems: 'center',
+    },
+
+    dot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#444',
+    },
+
+});

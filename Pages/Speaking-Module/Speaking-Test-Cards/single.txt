@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 
 export default function Single_Card({ useremail, redirect_func, test_card_image, rating, count_peoples, Title, test_Scores, sectionNames }) {
-    const [userPaymentStatusCheck, setuserPaymentStatusCheck] = useState(false)
+    const [userPaymentStatusCheck, setUserPaymentStatusCheck] = useState(false)
 
 
     return (

@@ -12,11 +12,12 @@ import {
 
 
 export const CheckPaymentStatus = () => {
-  const { setuserPaymentStatusCheck } = useStateContext();
+  const { setUserPaymentStatusCheck } = useStateContext();
   const [userEmail, setuserEmail] = useState('');
   const router = useRouter();
 
   useEffect(() => {
+    // alert("checking status")
     const fetchEmailAndCheckStatus = async () => {
       const email = await AsyncStorage.getItem('userEmail');
       if (!email) return;
@@ -24,7 +25,7 @@ export const CheckPaymentStatus = () => {
 
       const fetchPaymentStatus = async (url, callback) => {
         try {
-          const token = await AsyncStorage.getItem("loginTOken");
+          const token = await AsyncStorage.getItem("loginToken");
           if (!token) return;
 
           const response = await fetch(url + email, {
@@ -53,7 +54,7 @@ export const CheckPaymentStatus = () => {
             await AsyncStorage.multiRemove([
               'userName',
               'userEmail',
-              'loginTOken',
+              'loginToken',
               'setCountry',
               'setCountryFlag'
             ]);
@@ -63,12 +64,13 @@ export const CheckPaymentStatus = () => {
         }
       };
 
-      await fetchPaymentStatus(SSL_COMMERZ_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
-      await fetchPaymentStatus(AAMARPAY_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
-      await fetchPaymentStatus(PAYPAL_GET_USER_DATA_FROM_DATABASE, setuserPaymentStatusCheck);
+      await fetchPaymentStatus(SSL_COMMERZ_GET_USER_DATA_FROM_DATABASE, setUserPaymentStatusCheck);
+      await fetchPaymentStatus(AAMARPAY_GET_USER_DATA_FROM_DATABASE, setUserPaymentStatusCheck);
+      await fetchPaymentStatus(PAYPAL_GET_USER_DATA_FROM_DATABASE, setUserPaymentStatusCheck);
     };
 
     fetchEmailAndCheckStatus();
+    // alert("checked..")
   }, []);
 
   return null;

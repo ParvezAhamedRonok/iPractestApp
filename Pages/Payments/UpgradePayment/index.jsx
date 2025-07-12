@@ -22,7 +22,7 @@ import Loader from "@/Helper/Loader";
 
 function Index() {
     const history = useRouter();
-    const { userPaymentStatusCheck, setuserPaymentStatusCheck } = useStateContext();
+    const { userPaymentStatusCheck, setUserPaymentStatusCheck } = useStateContext();
 
     //all locaStorags data store into those states.....
     const [userCountry, setuserCountry] = useState('')
