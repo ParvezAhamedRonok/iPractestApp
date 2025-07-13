@@ -48,12 +48,14 @@ const TestimonialSlider = () => {
     } = useStateContext();
 
     useEffect(() => {
+        //if user is not loggedin make sure i am getting the country by this 
+        //const countryInfo = await AsyncStorage.getItem('CountryInfo')
         const fetchData = async () => {
             const email = await AsyncStorage.getItem('userEmail');
             const country = await AsyncStorage.getItem('setCountry');
             setUserEmail(email || 'mdpervez');
             setUserCountry(country || 'Bangladesh');
-
+            // alert(country)
             // // Dynamically check for payment page existence
             // const pageExists = true; // you can fetch or calculate this
             // setPaymentPageExists(pageExists);

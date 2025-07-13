@@ -11,7 +11,7 @@ export default function ResultImprovement({
   const blurStyle = storeTapContentForChangeUI !== '' ? styles.blur : null;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 20 }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 10 }}>
       <View style={styles.sectionContainer}>
         <View style={[styles.card, blurStyle]}>
           <Text style={styles.sectionTitle}>General Suggessions</Text>

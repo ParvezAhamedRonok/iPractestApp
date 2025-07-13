@@ -9,6 +9,7 @@ import NavigationFull from '../../components/NavigationFull';
 import Payment_Success from "./_PaymentStatus/PaymentSuccess/index"
 import Payment_Cancel from "./_PaymentStatus/PaymentCancel/index"
 import Payment_Failed from "./_PaymentStatus/PaymentFailed/index"
+import BillingPageCards from "./Payment-Slider/Payment-Card-Slider"
 
 const Main = () => {
     const { testID } = useLocalSearchParams();
@@ -28,7 +29,7 @@ const Main = () => {
                 testID === "Payment-Failed" && <Payment_Failed />
             }
             {
-                testID === "Billing-Page" && <Payment_Failed />
+                testID === "Billing-Page" && <BillingPageCards />
             }
             {
                 testID === "Upgrade-Payment-Pages" && <Payment_Failed />

@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { BlurView } from 'expo-blur';
 import {
     View, Text, TouchableOpacity, ScrollView, StyleSheet,
 } from 'react-native';
@@ -10,6 +11,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useRouter, useLocalSearchParams, usePathname } from 'expo-router';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -29,6 +31,7 @@ export default function ResultEvaluations({
     GrammarScore,
     storeCoherenceScore
 }) {
+    const router = useRouter();
     const [storeSubordinateWords, setStoringsubordinateWords] = useState([]);
     const [storeLinkingWords, setStoringLinkingWords] = useState([]);
 
@@ -166,110 +169,145 @@ export default function ResultEvaluations({
 
 
     return (
-        <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true}>
-            <ScoreBox
-                color="#541bac"
-                title="Coherence"
-                animatedValue={animatedCoherence}
-                score={storeCoherenceScore}
-                sectionKey="coherence"
-            >
-                <Text style={styles.detailTitle}>Subordinate Words</Text>
-                {storeSubordinateWords.map((item, idx) => (
-                    <Text key={idx} style={styles.detailItem}>• {item}</Text>
-                ))}
-                <Text style={styles.detailTitle}>Linking Words</Text>
-                {storeLinkingWords.map((item, idx) => (
-                    <Text key={idx} style={styles.detailItem}>• {item}</Text>
-                ))}
-            </ScoreBox>
+        <View style={{ flex: 1 }}>
+            <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true}>
+                <ScoreBox
+                    color="#541bac"
+                    title="Coherence"
+                    animatedValue={animatedCoherence}
+                    score={storeCoherenceScore}
+                    sectionKey="coherence"
+                >
+                    <Text style={styles.detailTitle}>Subordinate Words</Text>
+                    {storeSubordinateWords.map((item, idx) => (
+                        <Text key={idx} style={styles.detailItem}>• {item}</Text>
+                    ))}
+                    <Text style={styles.detailTitle}>Linking Words</Text>
+                    {storeLinkingWords.map((item, idx) => (
+                        <Text key={idx} style={styles.detailItem}>• {item}</Text>
+                    ))}
+                </ScoreBox>
 
-            <ScoreBox
-                color="#f59e0b"
-                title="Lexical Resource"
-                animatedValue={animatedLexical}
-                score={LexicalResourceScore}
-                sectionKey="lexical"
-            >
-                {lexicalResWords?.length > 0 ? (
-                    lexicalResWords.map((items, index) => {
-                        const isIntro = index === 0;
-                        const isSectionTitle = items.match(/:$/gi) && !isIntro;
-                        const isBullet = !isIntro && !isSectionTitle;
+                <ScoreBox
+                    color="#f59e0b"
+                    title="Lexical Resource"
+                    animatedValue={animatedLexical}
+                    score={LexicalResourceScore}
+                    sectionKey="lexical"
+                >
+                    {lexicalResWords?.length > 0 ? (
+                        lexicalResWords.map((items, index) => {
+                            const isIntro = index === 0;
+                            const isSectionTitle = items.match(/:$/gi) && !isIntro;
+                            const isBullet = !isIntro && !isSectionTitle;
 
-                        return (
-                            <View
-                                key={index}
-                                style={[
-                                    styles.bulletRow,
-                                    isIntro && { marginBottom: 6 },
-                                    isSectionTitle && { marginTop: 10, marginBottom: 6 },
-                                    isBullet && { marginBottom: 4 },
-                                ]}
-                            >
-                                {/* Bullet Dot */}
-                                {isBullet && (
-                                    <View style={styles.bulletWrapper}>
-                                        <View
-                                            style={[
-                                                styles.dot,
-                                                items.trim() === '' && { backgroundColor: 'transparent', marginLeft: 4 },
-                                            ]}
-                                        />
-                                    </View>
-                                )}
-
-                                {/* Text */}
-                                <Text
+                            return (
+                                <View
+                                    key={index}
                                     style={[
-                                        styles.bulletText,
-                                        isIntro && { fontWeight: 'bold', fontSize: 14 },
-                                        isSectionTitle && { fontWeight: 'bold', fontSize: 16 },
+                                        styles.bulletRow,
+                                        isIntro && { marginBottom: 6 },
+                                        isSectionTitle && { marginTop: 10, marginBottom: 6 },
+                                        isBullet && { marginBottom: 4 },
                                     ]}
                                 >
-                                    {items}
+                                    {/* Bullet Dot */}
+                                    {isBullet && (
+                                        <View style={styles.bulletWrapper}>
+                                            <View
+                                                style={[
+                                                    styles.dot,
+                                                    items.trim() === '' && { backgroundColor: 'transparent', marginLeft: 4 },
+                                                ]}
+                                            />
+                                        </View>
+                                    )}
+
+                                    {/* Text */}
+                                    <Text
+                                        style={[
+                                            styles.bulletText,
+                                            isIntro && { fontWeight: 'bold', fontSize: 14 },
+                                            isSectionTitle && { fontWeight: 'bold', fontSize: 16 },
+                                        ]}
+                                    >
+                                        {items}
+                                    </Text>
+                                </View>
+                            );
+                        })
+                    ) : (
+                        <Text>No lexical feedback found.</Text>
+                    )}
+
+                </ScoreBox>
+
+                <ScoreBox
+                    color="#3ed9ae"
+                    title="Grammatical Accuracy"
+                    animatedValue={animatedGrammar}
+                    score={GrammarScore}
+                    sectionKey="grammar"
+                >
+                    {grammerMistakes?.length > 0 ? (
+                        Object.entries(parseGrammarData(grammerMistakes)).map(([sectionTitle, items], idx) => (
+                            <View key={idx} style={{ marginBottom: 12 }}>
+                                <Text style={{ fontWeight: 'bold', fontSize: 15, marginBottom: 4, color: '#444' }}>
+                                    📌 {sectionTitle}
                                 </Text>
+                                {items.map((item, i) => (
+                                    <Text
+                                        key={i}
+                                        style={[
+                                            styles.detailItem,
+                                            /problem|issue|error|missing|incomplete/i.test(item) && { color: '#d32f2f', fontWeight: '500' },
+                                            /correct|should be|solution|fix|clarify|suggest/i.test(item) && { color: '#2e7d32', fontStyle: 'italic' },
+                                        ]}
+                                    >
+                                        • {item}
+                                    </Text>
+                                ))}
                             </View>
-                        );
-                    })
-                ) : (
-                    <Text>No lexical feedback found.</Text>
-                )}
+                        ))
+                    ) : (
+                        <Text>No grammar issues found.</Text>
+                    )}
+                </ScoreBox>
+            </ScrollView>
 
-            </ScoreBox>
+            {/* Blurred Overlay */}
+            {storeTapContentForChangeUI == "LoginFirst" && (
+                <BlurView intensity={90} tint="light" style={styles.blurOverlay}>
+                    <View style={styles.overlayContent}>
+                        <TouchableOpacity style={styles.overlayButton}
+                            onPress={() => {
+                                setchange_login_Status(false)
+                                userLoginFunction();
+                            }
+                            }>
+                            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Need to Login</Text>
+                        </TouchableOpacity>
+                    </View>
+                </BlurView>
+            )
+            }
 
-            <ScoreBox
-                color="#3ed9ae"
-                title="Grammatical Accuracy"
-                animatedValue={animatedGrammar}
-                score={GrammarScore}
-                sectionKey="grammar"
-            >
-                {grammerMistakes?.length > 0 ? (
-                    Object.entries(parseGrammarData(grammerMistakes)).map(([sectionTitle, items], idx) => (
-                        <View key={idx} style={{ marginBottom: 12 }}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 15, marginBottom: 4, color: '#444' }}>
-                                📌 {sectionTitle}
-                            </Text>
-                            {items.map((item, i) => (
-                                <Text
-                                    key={i}
-                                    style={[
-                                        styles.detailItem,
-                                        /problem|issue|error|missing|incomplete/i.test(item) && { color: '#d32f2f', fontWeight: '500' },
-                                        /correct|should be|solution|fix|clarify|suggest/i.test(item) && { color: '#2e7d32', fontStyle: 'italic' },
-                                    ]}
-                                >
-                                    • {item}
-                                </Text>
-                            ))}
-                        </View>
-                    ))
-                ) : (
-                    <Text>No grammar issues found.</Text>
-                )}
-            </ScoreBox>
-        </ScrollView>
+            {/* Blurred Overlay for premium button */}
+            {storeTapContentForChangeUI == "HaveToPay" && (
+                <BlurView intensity={90} tint="light" style={styles.blurOverlay}>
+                    <View style={styles.overlayContent}>
+                        <TouchableOpacity style={styles.overlayButton}
+                            onPress={() => {
+                                router.push("/Payment-Pages/Billing-Page")
+                            }
+                            }>
+                            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Premium</Text>
+                        </TouchableOpacity>
+                    </View>
+                </BlurView>
+            )
+            }
+        </View >
     );
 }
 
@@ -332,32 +370,66 @@ const styles = StyleSheet.create({
     },
 
     //some lexical extra styling..
-   bulletRow: {
-  flexDirection: 'row',
-  alignItems: 'flex-start',
-  width: '100%',
-  paddingRight: 8, // avoid edge cut
-},
+    bulletRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        width: '100%',
+        paddingRight: 8, // avoid edge cut
+    },
 
-bulletWrapper: {
-  width: 25,
-  alignItems: 'center',
-  paddingTop: 4,
-},
+    bulletWrapper: {
+        width: 25,
+        alignItems: 'center',
+        paddingTop: 4,
+    },
 
-dot: {
-  width: 8,
-  height: 8,
-  borderRadius: 4,
-  backgroundColor: '#444',
-},
+    dot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#444',
+    },
 
-bulletText: {
-  flex: 1, // THIS ensures text wraps
-  flexWrap: 'wrap',
-  fontSize: 14,
-  color: '#333',
-},
+    bulletText: {
+        flex: 1, // THIS ensures text wraps
+        flexWrap: 'wrap',
+        fontSize: 14,
+        color: '#333',
+    },
 
+
+    //blur background er layer dewar  styling
+    blurOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999,
+    },
+    overlayContent: {
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        borderRadius: 20,
+        padding: 20,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        backdropFilter: 'blur(10px)', // Not used in React Native but conceptually helpful
+    },
+    overlayText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 12,
+        color: '#333',
+    },
+    overlayButton: {
+        backgroundColor: '#541bac',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+    },
 
 });
