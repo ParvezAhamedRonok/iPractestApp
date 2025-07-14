@@ -28,9 +28,10 @@ export async function Needto_login_button_cond_Then_give_access(
   const userToken = await AsyncStorage.getItem("loginTOken");
 
   if (!useremail || !userToken) {
-    router.push("/auth/login");
+    alert('user not found....')
     return;
   }
+  alert(useremail)
 
   setLoadingGlobally(true);
 

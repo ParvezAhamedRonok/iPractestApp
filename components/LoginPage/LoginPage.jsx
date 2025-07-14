@@ -79,12 +79,17 @@ export default function LoginPage() {
       setTimeout(() => {
         setLoadingMsg(false);
         //here i can redirect the user to the Dashboard page or same page Functions
-        if (OpenClose_LogSign_Popup.includes("Same")) { globalFunction() }
+        if (OpenClose_LogSign_Popup.includes("Same")) {
+          // alert("Same")
+          setTimeout(() => {
+            globalFunction();
+          }, 1000);
+        }
         else {
           //close login/signup popup..
           setOpenClose_LogSign_Popup("");
           nextPath("/User-Dashboard/Dashboard")
-          // alert("ok")
+          // alert("Not Same")
         }
 
       }, 1000);

@@ -378,6 +378,7 @@ export default function WritingTextArea({ task }) {
     //first making empty that registered functions arrays 
     functionQueue.current = [];
     setTimeout(() => {
+      change_login_Status ? alert("true") : alert("false")
       //after one second store functions into that array which one i want to load after successfully logged in
       registerFunction(change_login_Status ? Reload_Page_func : functionForCheckConditions);
       //for opening the Same_page login popup
@@ -397,6 +398,7 @@ export default function WritingTextArea({ task }) {
   };
 
   const functionForCheckConditions = () => {
+    alert("inside")
     Needto_login_button_cond_Then_give_access(
       userPaymentStatusCheck,
       router,
@@ -528,7 +530,7 @@ export default function WritingTextArea({ task }) {
         changeTap={changeTap}
         setChangeTap={setChangeTap}
         storeTapContentForChangeUI={storeTapContentForChangeUI}
-        userLoginFunction={userLoginFunction}
+        userLoginFunction={openLogInPageForIpractestFeedback}
         setchange_login_Status={setchange_login_Status}
         itemsSet={itemsSet}
         imageText={imageText}
