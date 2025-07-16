@@ -15,6 +15,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import WritingTextArea from '../Writing-main/Important/Pages/Task-1-Component';
+import WritingTextArea2 from '../Writing-main/Important/Pages/Task-2-Component';
 import WritingCardMainImg from '../../../assets/images/Writing-Images/about-writing-pic-1.png';
 import FirstSecImg1 from '../../../assets/images/Writing-Images/firstSec-Img1.png';
 import FirstSecImg2 from '../../../assets/images/Writing-Images/firstSec-Img2.png';
@@ -135,7 +136,7 @@ export default function AllWritingTestServices() {
       </View>
 
       <View style={styles.taskArea}>
-        {changeState === 'task1' ? <WritingTextArea task={1} /> : <WritingTextArea task={2} />}
+        {changeState === 'task1' ? <WritingTextArea task={1} /> : <WritingTextArea2 task={2} />}
       </View>
 
       <View style={styles.actualTests}>

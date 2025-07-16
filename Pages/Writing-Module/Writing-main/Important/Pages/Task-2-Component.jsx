@@ -41,7 +41,7 @@ import ResultPopUp from './ResultPopup';
 let ImageArray = [];
 let userTextToPassResultEvaluation;
 
-export default function WritingTextArea({ task }) {
+export default function WritingTextArea2({ task }) {
   const router = useRouter();
   const { pathname } = useLocalSearchParams();
   const GetFullPathName = usePathname(); // ✅ Expo Router pathname

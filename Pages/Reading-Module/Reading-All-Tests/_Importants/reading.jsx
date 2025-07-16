@@ -73,7 +73,7 @@ function Reading({ RightAnswers }) {
         setActivePanels(!ActivePanels)
     }
 
-    // alert(testId)
+ 
 
     const onPress = ActivePanels ? Mobilepanel1Functions : Mobilepanel2Functions;
     const isQuestionView = ActivePanels ? mobilePanel1Pages : MobilePanel2Pages;
@@ -87,12 +87,13 @@ function Reading({ RightAnswers }) {
                                 <>
                                     {/* Passages for Page-1 */}
                                     {/* {testID === "Actual-Test-1" && <Test1Panel1_Page1 />} */}
-                                    {testID === "Cambridge-Test-1" && <Test1Panel1_Page1 />}
+                                    {testID === "Cambridge-19-Test1" && <Test1Panel1_Page1 />}
                                 </>
                             ) : (
                                 <>
                                     {/* Questions for Page-1 */}
-                                    {testID === "Cambridge-Test-1" && <Test1Panel2_Page1 RightAnswers={RightAnswers} />}
+                                    {/* {testID === "Actual-Test-1" && <Test1Panel1_Page1 />} */}
+                                    {testID === "Cambridge-19-Test1" && <Test1Panel2_Page1 RightAnswers={RightAnswers} />}
                                 </>
                             )}
                         </View>
@@ -101,12 +102,14 @@ function Reading({ RightAnswers }) {
                             {MobilePanel2Pages ? (
                                 <>
                                     {/* Passages for Page-1 */}
-                                    {testID === "Cambridge-Test-1" && <Test1Panel1_Page2 />}
+                                    {/* {testID === "Actual-Test-1" && <Test1Panel1_Page1 />} */}
+                                    {testID === "Cambridge-19-Test1" && <Test1Panel1_Page2 />}
                                 </>
                             ) : (
                                 <>
                                     {/* Questions for Page-1 */}
-                                    {testID === "Cambridge-Test-1" && <Test1Panel2_Page2 RightAnswers={RightAnswers} />}
+                                    {/* {testID === "Actual-Test-1" && <Test1Panel1_Page1 />} */}
+                                    {testID === "Cambridge-19-Test1" && <Test1Panel2_Page2 RightAnswers={RightAnswers} />}
                                 </>
                             )}
                         </View>
