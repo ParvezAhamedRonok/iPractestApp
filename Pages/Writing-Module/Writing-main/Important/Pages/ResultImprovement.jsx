@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator , TouchableOpacity } from 'react-native';
 import { BlurView } from 'expo-blur';
 
 export default function ResultImprovement({
@@ -98,7 +98,7 @@ export default function ResultImprovement({
 
       {/* Blurred Overlay for premium button */}
       {storeTapContentForChangeUI == "HaveToPay" && (
-        <BlurView intensity={90} tint="light" style={styles.blurOverlay}>
+        <BlurView intensity={100} tint="light" style={styles.blurOverlay}>
           <View style={styles.overlayContent}>
             <TouchableOpacity style={styles.overlayButton}
               onPress={() => {
