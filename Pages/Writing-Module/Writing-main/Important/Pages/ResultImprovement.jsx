@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { BlurView } from 'expo-blur';
 
 export default function ResultImprovement({
   storeTapContentForChangeUI,
@@ -11,71 +12,106 @@ export default function ResultImprovement({
   const blurStyle = storeTapContentForChangeUI !== '' ? styles.blur : null;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 10 }}>
-      <View style={styles.sectionContainer}>
-        <View style={[styles.card, blurStyle]}>
-          <Text style={styles.sectionTitle}>General Suggessions</Text>
-          {SpeakingSummary.length === 0 ? (
-            <View style={styles.loaderWrapper}>
-              <ActivityIndicator size="large" color="#000" />
-            </View>
-          ) : (
-            SpeakingSummary.map((item, index) => {
-              if (
-                !item ||
-                item.trim() === '' ||
-                item.trim() === '.' ||
-                item.charAt(3) === ','
-              ) {
-                return null;
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 10 }}>
+        <View style={styles.sectionContainer}>
+          <View style={[styles.card, blurStyle]}>
+            <Text style={styles.sectionTitle}>General Suggessions</Text>
+            {SpeakingSummary.length === 0 ? (
+              <View style={styles.loaderWrapper}>
+                <ActivityIndicator size="large" color="#000" />
+              </View>
+            ) : (
+              SpeakingSummary.map((item, index) => {
+                if (
+                  !item ||
+                  item.trim() === '' ||
+                  item.trim() === '.' ||
+                  item.charAt(3) === ','
+                ) {
+                  return null;
+                }
+                const isHeading = item.match(/:/gi);
+                return (
+                  <View
+                    key={index}
+                    style={[
+                      styles.textLine,
+                      isHeading ? styles.headingText : styles.bulletedText,
+                    ]}>
+                    {!isHeading && <View style={styles.bullet} />}
+                    <Text style={styles.textContent}>{item}</Text>
+                  </View>
+                );
+              })
+            )}
+          </View>
+
+          <View style={[styles.card, blurStyle]}>
+            <Text style={styles.sectionTitle}>Section Wise Suggessions</Text>
+            {SpeakingImprovement.length === 0 ? (
+              <View style={styles.loaderWrapper}>
+                <ActivityIndicator size="large" color="#000" />
+              </View>
+            ) : (
+              SpeakingImprovement.map((item, index) => {
+                const isHeading =
+                  index === 0 ||
+                  item.slice(0, 20).match(/Fluency|Coherence|Lexical|Overall/g) ||
+                  item.slice(0, 25).match(/Grammatical Range/g);
+
+                if (item.trim() === '') return null;
+
+                return (
+                  <View
+                    key={index}
+                    style={[
+                      styles.textLine,
+                      isHeading ? styles.subHeadingText : styles.bulletedText,
+                    ]}>
+                    {!isHeading && <View style={styles.bullet} />}
+                    <Text style={styles.textContent}>{item}</Text>
+                  </View>
+                );
+              })
+            )}
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Blurred Overlay */}
+      {storeTapContentForChangeUI == "LoginFirst" && (
+        <BlurView intensity={90} tint="light" style={styles.blurOverlay}>
+          <View style={styles.overlayContent}>
+            <TouchableOpacity style={styles.overlayButton}
+              onPress={() => {
+                // setchange_login_Status(false)
+                userLoginFunction(status = 'status');
               }
-              const isHeading = item.match(/:/gi);
-              return (
-                <View
-                  key={index}
-                  style={[
-                    styles.textLine,
-                    isHeading ? styles.headingText : styles.bulletedText,
-                  ]}>
-                  {!isHeading && <View style={styles.bullet} />}
-                  <Text style={styles.textContent}>{item}</Text>
-                </View>
-              );
-            })
-          )}
-        </View>
+              }>
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Need to Login</Text>
+            </TouchableOpacity>
+          </View>
+        </BlurView>
+      )
+      }
 
-        <View style={[styles.card, blurStyle]}>
-          <Text style={styles.sectionTitle}>Section Wise Suggessions</Text>
-          {SpeakingImprovement.length === 0 ? (
-            <View style={styles.loaderWrapper}>
-              <ActivityIndicator size="large" color="#000" />
-            </View>
-          ) : (
-            SpeakingImprovement.map((item, index) => {
-              const isHeading =
-                index === 0 ||
-                item.slice(0, 20).match(/Fluency|Coherence|Lexical|Overall/g) ||
-                item.slice(0, 25).match(/Grammatical Range/g);
-
-              if (item.trim() === '') return null;
-
-              return (
-                <View
-                  key={index}
-                  style={[
-                    styles.textLine,
-                    isHeading ? styles.subHeadingText : styles.bulletedText,
-                  ]}>
-                  {!isHeading && <View style={styles.bullet} />}
-                  <Text style={styles.textContent}>{item}</Text>
-                </View>
-              );
-            })
-          )}
-        </View>
-      </View>
-    </ScrollView>
+      {/* Blurred Overlay for premium button */}
+      {storeTapContentForChangeUI == "HaveToPay" && (
+        <BlurView intensity={90} tint="light" style={styles.blurOverlay}>
+          <View style={styles.overlayContent}>
+            <TouchableOpacity style={styles.overlayButton}
+              onPress={() => {
+                router.push("/Payment-Pages/Billing-Page")
+              }
+              }>
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Premium</Text>
+            </TouchableOpacity>
+          </View>
+        </BlurView>
+      )
+      }
+    </View>
   );
 }
 
@@ -146,4 +182,39 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#333',
   },
+
+
+  //blur background er layer dewar  styling
+    blurOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999,
+    },
+    overlayContent: {
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        borderRadius: 20,
+        padding: 20,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        backdropFilter: 'blur(10px)', // Not used in React Native but conceptually helpful
+    },
+    overlayText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 12,
+        color: '#333',
+    },
+    overlayButton: {
+        backgroundColor: '#541bac',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+    },
 });

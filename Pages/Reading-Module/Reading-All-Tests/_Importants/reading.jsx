@@ -86,12 +86,13 @@ function Reading({ RightAnswers }) {
                             {mobilePanel1Pages ? (
                                 <>
                                     {/* Passages for Page-1 */}
-                                    {testID === "Actual-Test-1" && <Test1Panel1_Page1 />}
+                                    {/* {testID === "Actual-Test-1" && <Test1Panel1_Page1 />} */}
+                                    {testID === "Cambridge-Test-1" && <Test1Panel1_Page1 />}
                                 </>
                             ) : (
                                 <>
                                     {/* Questions for Page-1 */}
-                                    {testID === "Actual-Test-1" && <Test1Panel2_Page1 RightAnswers={RightAnswers} />}
+                                    {testID === "Cambridge-Test-1" && <Test1Panel2_Page1 RightAnswers={RightAnswers} />}
                                 </>
                             )}
                         </View>
@@ -100,12 +101,12 @@ function Reading({ RightAnswers }) {
                             {MobilePanel2Pages ? (
                                 <>
                                     {/* Passages for Page-1 */}
-                                    {testID === "Actual-Test-1" && <Test1Panel1_Page2 />}
+                                    {testID === "Cambridge-Test-1" && <Test1Panel1_Page2 />}
                                 </>
                             ) : (
                                 <>
                                     {/* Questions for Page-1 */}
-                                    {testID === "Actual-Test-1" && <Test1Panel2_Page2 RightAnswers={RightAnswers} />}
+                                    {testID === "Cambridge-Test-1" && <Test1Panel2_Page2 RightAnswers={RightAnswers} />}
                                 </>
                             )}
                         </View>

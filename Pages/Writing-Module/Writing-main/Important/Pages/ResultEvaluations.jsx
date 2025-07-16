@@ -281,10 +281,8 @@ export default function ResultEvaluations({
                     <View style={styles.overlayContent}>
                         <TouchableOpacity style={styles.overlayButton}
                             onPress={() => {
-                                setchange_login_Status(false)
-                                setTimeout(() => {
-                                    userLoginFunction();
-                                }, 2000);
+                                // setchange_login_Status(false)
+                                userLoginFunction(status = 'status');
                             }
                             }>
                             <Text style={{ color: '#fff', fontWeight: 'bold' }}>Need to Login</Text>

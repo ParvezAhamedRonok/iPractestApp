@@ -374,16 +374,16 @@ export default function WritingTextArea({ task }) {
   //   useremail ? (AsyncStorage.removeItem('WritingNo'), uploadImageGCP()) : openLogInPageForIpractestFeedback();
   // };
 
-  const openLogInPageForIpractestFeedback = () => {
+  const openLogInPageForIpractestFeedback = (status) => {
     //first making empty that registered functions arrays 
     functionQueue.current = [];
     setTimeout(() => {
-      change_login_Status ? alert("true") : alert("false")
       //after one second store functions into that array which one i want to load after successfully logged in
-      registerFunction(change_login_Status ? Reload_Page_func : functionForCheckConditions);
+      registerFunction(status === "Status" ? Reload_Page_func : functionForCheckConditions);
+        // status === "Status" ? alert(status) : alert(status)
       //for opening the Same_page login popup
       setOpenClose_LogSign_Popup('Same_Login');
-    }, 1000);
+    }, 2000);
   };
 
   const userLoginFunction = () => {
@@ -398,7 +398,6 @@ export default function WritingTextArea({ task }) {
   };
 
   const functionForCheckConditions = () => {
-    alert("inside")
     Needto_login_button_cond_Then_give_access(
       userPaymentStatusCheck,
       router,

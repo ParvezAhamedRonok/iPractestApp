@@ -118,7 +118,7 @@ const SignUpPage = () => {
       const res = await response.json();
 
       if (res?.token) {
-        await AsyncStorage.setItem('loginTOken', res.token);
+        await AsyncStorage.setItem('loginToken', res.token);
         await AsyncStorage.setItem('userName', res.username);
         await AsyncStorage.setItem('userEmail', res.email);
         await AsyncStorage.setItem('setCountry', res.country);
@@ -128,7 +128,12 @@ const SignUpPage = () => {
         }
 
         if (OpenClose_LogSign_Popup.includes("Same")) {
-          globalFunction();
+          // globalFunction();
+          //after one munite letter call that function..
+          //  for getting the local data because it's may be take som time
+          setTimeout(() => {
+            globalFunction();
+          }, 1000);
         } else {
           //close login/sign up popup 
           setOpenClose_LogSign_Popup("");

@@ -82,7 +82,7 @@ export default function AllWritingTestServices() {
 
 
   const ScoreCircle = ({ scores }) => {
-    alert(scores)
+    // alert(scores)
     const latest = scores[scores.length - 1].ieltsRate;
     const rate = Number(latest);
     let bg = rate > 6 ? '#2ecc71' : rate >= 4 ? '#f1c40f' : '#e74c3c';
