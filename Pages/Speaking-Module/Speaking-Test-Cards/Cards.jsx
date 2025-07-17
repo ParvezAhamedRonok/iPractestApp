@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+// import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 
 // Dummy image imports (you’ll replace dynamically if needed)
 import test1Sec1Images from '../../../assets/images/Speaking-Images/test1Sec-1.png';
@@ -10,7 +11,7 @@ import test1Sec3Images from '../../../assets/images/Speaking-Images/test1Sec-3.p
 import Single_Card from './Single-Card';
 
 const Speaking_Cards = ({ openTestAfter10, setOpenTestsAfter10, mainDataAll }) => {
-  const navigation = useNavigation();
+  const navigation = useRouter();
   const [useremail] = useState('parvez');
 
   const tests = Array.from({ length: 40 }, (_, i) => {
@@ -33,7 +34,7 @@ const Speaking_Cards = ({ openTestAfter10, setOpenTestsAfter10, mainDataAll }) =
 
   const handleNavigate = (id) => {
     if (useremail) {
-      navigation.navigate('Speaking-Main-Page', { ID: id });
+      navigation.push(`Speaking-Module/Speaking-Tests/${id}`);
     } else {
       Alert.alert('Login Required', 'Need to login first');
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import AboutUsPage from "../../Pages/About-Us/index"
+import AboutUsPage from "../../Pages/Speech-To-Text/SpeechToTextInWebView"
 export default function Index() {
   return (
     <>

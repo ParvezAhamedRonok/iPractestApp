@@ -27,6 +27,10 @@ export default function HomeScreen() {
         <Text style={styles.buttonText}>Writing Section</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/Speaking-Module/Cards')}>
+        <Text style={styles.buttonText}>Speaking</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={() => router.push('/About Us')}>
         <Text style={styles.buttonText}>About-Us</Text>
       </TouchableOpacity>
